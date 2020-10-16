@@ -79,7 +79,11 @@
                     <el-input v-model="temp.cover" />
                 </el-form-item>
                 <el-form-item label="所属班级" prop="class_id">
-                    <el-input v-model="temp.class_id" />
+                    <el-select v-model="temp.class_id" placeholder="选择关联班级">
+                    <el-option label="硬笔书法" value="1" />
+                    <el-option label="硬笔书法二班" value="2" />
+                    <el-option label="硬笔书法三班" value="3" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="视频" prop="video_id">
                     <el-input v-model="temp.video_id" />
