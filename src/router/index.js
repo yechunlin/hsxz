@@ -44,6 +44,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/course',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'course',
+        component: () => import('@/views/course/index'),
+        meta: { title: '课程', icon: 'table' }
+      }
+    ]
+  },
+  {
     path: '/video',
     component: Layout,
     children: [

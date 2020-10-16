@@ -1,8 +1,8 @@
 <template>
     <div class="app-container">
         <div class="filter-container" style="margin:0 0 5px 0">
-            <el-input v-model="listQuery.id" placeholder="班级id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
-            <el-input v-model="listQuery.name" placeholder="班级名称" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="listQuery.id" placeholder="课程id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="listQuery.title" placeholder="课程名称" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
             </el-button>
@@ -21,24 +21,34 @@
                 style="width: 100%;"
                 @sort-change="sortChange"
         >
-            <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+            <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortCourse('id')">
                 <template slot-scope="{row}">
                     <span>{{ row.id }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="名称" min-width="50px">
+            <el-table-column label="课程名称" min-width="50px">
                 <template slot-scope="{row}">
-                    <span class="link-type">{{ row.name }}</span>
+                    <span class="link-type">{{ row.title }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="描述" min-width="100px">
+            <el-table-column label="封面" min-width="100px">
                 <template slot-scope="{row}">
-                    <span class="link-type">{{ row.description }}</span>
+                    <span class="link-type">{{ row.cover }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="日期" width="170px" align="center">
+            <el-table-column label="所属班级" width="170px" align="center">
                 <template slot-scope="{row}">
-                    <span>{{ row.dated }}</span>
+                    <span>{{ row.class_id }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="视频" width="110px" align="center">
+                <template slot-scope="{row}">
+                    <span>{{ row.video_id }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="授课老师" width="110px" align="center">
+                <template slot-scope="{row}">
+                    <span>{{ row.teacher_id }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="创建者" width="110px" align="center">
@@ -58,15 +68,24 @@
             </el-table-column>
         </el-table>
 
-        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getClassList" />
+        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getCourseList" />
 
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-            <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-                <el-form-item label="名称" prop="name">
-                    <el-input v-model="temp.name" />
+            <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+                <el-form-item label="课程名称" prop="title">
+                    <el-input v-model="temp.title" />
                 </el-form-item>
-                <el-form-item label="描述" prop="description">
-                    <el-input v-model="temp.description" />
+                <el-form-item label="封面图" prop="cover">
+                    <el-input v-model="temp.cover" />
+                </el-form-item>
+                <el-form-item label="所属班级" prop="class_id">
+                    <el-input v-model="temp.class_id" />
+                </el-form-item>
+                <el-form-item label="视频" prop="video_id">
+                    <el-input v-model="temp.video_id" />
+                </el-form-item>
+                <el-form-item label="授课老师" prop="teacher_id">
+                    <el-input v-model="temp.teacher_id" />
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -83,14 +102,14 @@
 </template>
 
 <script>
-    import { getClass, addClass, updateClass, deleteClass } from '@/api/class'
+    import { getCourse, addCourse, updateCourse, deleteCourse } from '@/api/course'
     import waves from '@/directive/waves' // waves directive
     import { parseTime } from '@/utils'
     import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 
     export default {
-        name: 'calssList',
+        name: 'courseList',
         components: { Pagination },
         directives: { waves },
 
@@ -108,8 +127,11 @@
                 },
                 showReviewer: false,
                 temp: {
-                    name: '',
-                    description: ''
+                    title: '',
+                    cover: '',
+                    class_id: '',
+                    video_id: '',
+                    teacher_id: ''
                 },
                 dialogFormVisible: false,
                 dialogStatus: '',
@@ -119,19 +141,22 @@
                 },
                 dialogPvVisible: false,
                 rules: {
-                    description: [{ required: true, message: 'description is required', trigger: 'blur' }],
-                    name: [{ required: true, message: 'name is required', trigger: 'blur' }]
+                    title: [{ required: true, message: 'title is required', trigger: 'blur' }],
+                    cover: [{ required: true, message: 'cover is required', trigger: 'blur' }],
+                    class_id: [{ required: true, message: 'class_id is required', trigger: 'blur' }],
+                    video_id: [{ required: true, message: 'video_id is required', trigger: 'blur' }],
+                    teacher_id: [{ required: true, message: 'teacher_id is required', trigger: 'blur' }]
                 },
                 downloadLoading: false
             }
         },
         created() {
-            this.getClassList();
+            this.getCourseList();
         },
         methods: {
-            getClassList() {
+            getCourseList() {
                 this.listLoading = true
-                getClass(this.listQuery).then(response => {
+                getCourse(this.listQuery).then(response => {
                     console.log(response.data);
                     this.list = response.data.items
                     this.total = response.data.total
@@ -143,7 +168,7 @@
             },
             handleFilter() {
                 this.listQuery.page = 1
-                this.getClassList()
+                this.getCourseList()
             },
             handleModifyStatus(row, status) {
                 this.$message({
@@ -168,8 +193,11 @@
             },
             resetTemp() {
                 this.temp = {
-                    name: '',
-                    description: ''
+                    title: '',
+                    cover: '',
+                    class_id: '',
+                    video_id: '',
+                    teacher_id: ''
                 }
             },
             handleCreate() {
@@ -183,8 +211,8 @@
             createData() {
                 this.$refs['dataForm'].validate((valid) => {
                     if (valid) {
-                        this.temp.admin_id = 1;
-                        addClass(this.temp).then((response) => {
+                        this.temp.admin_id = 1;//admin_id
+                        addCourse(this.temp).then((response) => {
                             this.list.unshift(response.data)
                             this.dialogFormVisible = false
                             this.$notify({
@@ -209,7 +237,7 @@
                 this.$refs['dataForm'].validate((valid) => {
                     if (valid) {
                         const tempData = Object.assign({}, this.temp)
-                        updateClass(tempData).then((response) => {
+                        updateCourse(tempData).then((response) => {
                             const index = this.list.findIndex(v => v.id === this.temp.id)
                             this.list.splice(index, 1, this.temp)
                             this.dialogFormVisible = false
@@ -224,7 +252,7 @@
                 })
             },
             handleDelete(row, index) {
-                deleteClass({id: row.id}).then((response) => {
+                deleteCourse({id: row.id}).then((response) => {
                     this.$notify({
                         title: 'Success',
                         message: 'Delete Successfully',
@@ -234,9 +262,9 @@
                     this.list.splice(index, 1)
                 })
             },
-            getSortClass: function(key) {
+            getSortCourse: function(key) {
                 const sort = this.listQuery.sort
-                return sort == 0 ? 'ascending' : 'descending'
+                return sort == 0 ? 'ascending' : 'descending';
             }
         }
     }
