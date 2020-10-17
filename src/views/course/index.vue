@@ -31,14 +31,15 @@
                     <span class="link-type">{{ row.title }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="封面" min-width="100px">
+            <el-table-column label="封面" min-width="50px">
                 <template slot-scope="{row}">
-                    <span class="link-type">{{ row.cover }}</span>
+                    <img :src="row.cover" style="height:100px">
+                    <!--<span class="link-type">{{ row.cover }}</span>-->
                 </template>
             </el-table-column>
             <el-table-column label="所属班级" width="170px" align="center">
                 <template slot-scope="{row}">
-                    <span>{{ row.class_id }}</span>
+                    <span>{{ row.class_name }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="视频" width="110px" align="center">
@@ -48,12 +49,12 @@
             </el-table-column>
             <el-table-column label="授课老师" width="110px" align="center">
                 <template slot-scope="{row}">
-                    <span>{{ row.teacher_id }}</span>
+                    <span>{{ row.teacher_name }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="创建者" width="110px" align="center">
                 <template slot-scope="{row}">
-                    <span>{{ row.admin_id }}</span>
+                    <span>{{ row.admin_name }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -71,12 +72,33 @@
         <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getCourseList" />
 
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-            <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+            <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 800px; margin-left:50px;">
                 <el-form-item label="课程名称" prop="title">
                     <el-input v-model="temp.title" />
                 </el-form-item>
                 <el-form-item label="封面图" prop="cover">
-                    <el-input v-model="temp.cover" />
+                        <div class="image-preview">
+                            <div class="image-preview-wrapper">
+                                <img :src="temp.cover">
+                                <div class="image-preview-action">
+                                <i class="el-icon-delete" />
+                                </div>
+                            </div>
+                        </div>
+                        <el-upload
+                        :data="{}"
+                        :multiple="false"
+                        :show-file-list="false"
+                        :on-success="handleImageSuccess"
+                        class="image-uploader"
+                        drag
+                        action="http://localhost/api/public/index.php/Upload/execAction"
+                        >
+                        <i class="el-icon-upload" />
+                        <div class="el-upload__text">
+                            将图片拖到此处，或<em>点击上传</em>
+                        </div>
+                        </el-upload>
                 </el-form-item>
                 <el-form-item label="所属班级" prop="class_id">
                     <el-select v-model="temp.class_id" placeholder="选择关联班级">
@@ -110,11 +132,11 @@
     import waves from '@/directive/waves' // waves directive
     import { parseTime } from '@/utils'
     import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
+    import ImageCropper from '@/components/ImageCropper'
 
     export default {
         name: 'courseList',
-        components: { Pagination },
+        components: { Pagination, ImageCropper },
         directives: { waves },
 
         data() {
@@ -151,7 +173,10 @@
                     video_id: [{ required: true, message: 'video_id is required', trigger: 'blur' }],
                     teacher_id: [{ required: true, message: 'teacher_id is required', trigger: 'blur' }]
                 },
-                downloadLoading: false
+                downloadLoading: false,
+                imagecropperShow: false,
+                imagecropperKey: 0,
+                image: 'https://wpimg.wallstcn.com/577965b9-bb9e-4e02-9f0c-095b41417191'
             }
         },
         created() {
@@ -269,7 +294,61 @@
             getSortCourse: function(key) {
                 const sort = this.listQuery.sort
                 return sort == 0 ? 'ascending' : 'descending';
+            },
+            handleImageSuccess(file) {
+                this.temp.cover = 'http://localhost/api/' + file.saveName;
+                //console.log(file);
             }
         }
     }
 </script>
+<style lang="scss" scoped>
+@import "~@/styles/mixin.scss";
+.image-uploader {
+width: 35%;
+float: left;
+}
+.image-preview {
+    max-width:350px;
+    min-width:200px;
+    height: 180px;
+    position: relative;
+    border: 1px dashed #d9d9d9;
+    float: left;
+    .image-preview-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    .image-preview-action {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        cursor: default;
+        text-align: center;
+        color: #fff;
+        opacity: 0;
+        font-size: 20px;
+        background-color: rgba(0, 0, 0, .5);
+        transition: opacity .3s;
+        cursor: pointer;
+        text-align: center;
+        line-height: 200px;
+        .el-icon-delete {
+            font-size: 36px;
+        }
+    }
+    &:hover {
+        .image-preview-action {
+            opacity: 1;
+        }
+    }
+}
+    
+</style>
