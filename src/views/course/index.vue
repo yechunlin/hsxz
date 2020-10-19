@@ -102,16 +102,16 @@
                 </el-form-item>
                 <el-form-item label="所属班级" prop="class_id">
                     <el-select v-model="temp.class_id" placeholder="选择关联班级">
-                    <el-option label="硬笔书法" value="1" />
-                    <el-option label="硬笔书法二班" value="2" />
-                    <el-option label="硬笔书法三班" value="3" />
+                    <el-option v-for="items in selectClass" :key="items.id" :label="items.name" :value="items.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="视频" prop="video_id">
                     <el-input v-model="temp.video_id" />
                 </el-form-item>
                 <el-form-item label="授课老师" prop="teacher_id">
-                    <el-input v-model="temp.teacher_id" />
+                    <el-select v-model="temp.teacher_id" placeholder="选择授课老师">
+                    <el-option v-for="items in selectTeacher" :key="items.id" :label="items.username" :value="items.id" />
+                    </el-select>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -129,6 +129,8 @@
 
 <script>
     import { getCourse, addCourse, updateCourse, deleteCourse } from '@/api/course'
+    import { getClass } from '@/api/class'
+    import { getUser } from '@/api/user'
     import waves from '@/directive/waves' // waves directive
     import { parseTime } from '@/utils'
     import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -173,10 +175,8 @@
                     video_id: [{ required: true, message: 'video_id is required', trigger: 'blur' }],
                     teacher_id: [{ required: true, message: 'teacher_id is required', trigger: 'blur' }]
                 },
-                downloadLoading: false,
-                imagecropperShow: false,
-                imagecropperKey: 0,
-                image: 'https://wpimg.wallstcn.com/577965b9-bb9e-4e02-9f0c-095b41417191'
+                selectClass: {},
+                selectTeacher: {}
             }
         },
         created() {
@@ -231,6 +231,12 @@
             },
             handleCreate() {
                 this.resetTemp()
+                if(JSON.stringify(this.selectClass) == '{}'){
+                    this.getSelectClass();
+                }
+                if(JSON.stringify(this.selectTeacher) == '{}'){
+                    this.getSelectTeacher();
+                }
                 this.dialogStatus = 'create'
                 this.dialogFormVisible = true
                 this.$nextTick(() => {
@@ -289,6 +295,20 @@
                         duration: 2000
                     })
                     this.list.splice(index, 1)
+                })
+            },
+            getSelectClass: function(){
+                getClass({
+                    limit: 100
+                }).then(response => {
+                    this.selectClass = response.data.items
+                })
+            },
+            getSelectTeacher: function(){
+                getUser({
+                    limit: 100
+                }).then(response => {
+                    this.selectTeacher = response.data.items
                 })
             },
             getSortCourse: function(key) {
