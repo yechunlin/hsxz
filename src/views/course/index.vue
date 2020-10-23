@@ -44,7 +44,7 @@
             </el-table-column>
             <el-table-column label="视频" width="110px" align="center">
                 <template slot-scope="{row}">
-                    <span>{{ row.video_id }}</span>
+                    <span></span>
                 </template>
             </el-table-column>
             <el-table-column label="授课老师" width="110px" align="center">
@@ -81,7 +81,7 @@
                             <div class="image-preview-wrapper">
                                 <img :src="temp.cover">
                                 <div class="image-preview-action">
-                                <i class="el-icon-delete" />
+                                <i class="el-icon-delete" @click="rmImage"/>
                                 </div>
                             </div>
                         </div>
@@ -104,9 +104,6 @@
                     <el-select v-model="temp.class_id" placeholder="选择关联班级">
                     <el-option v-for="items in selectClass" :key="items.id" :label="items.name" :value="items.id" />
                     </el-select>
-                </el-form-item>
-                <el-form-item label="视频" prop="video_id">
-                    <el-input v-model="temp.video_id" />
                 </el-form-item>
                 <el-form-item label="授课老师" prop="teacher_id">
                     <el-select v-model="temp.teacher_id" placeholder="选择授课老师">
@@ -158,7 +155,6 @@
                     title: '',
                     cover: '',
                     class_id: '',
-                    video_id: '',
                     teacher_id: ''
                 },
                 dialogFormVisible: false,
@@ -172,7 +168,6 @@
                     title: [{ required: true, message: 'title is required', trigger: 'blur' }],
                     cover: [{ required: true, message: 'cover is required', trigger: 'blur' }],
                     class_id: [{ required: true, message: 'class_id is required', trigger: 'blur' }],
-                    video_id: [{ required: true, message: 'video_id is required', trigger: 'blur' }],
                     teacher_id: [{ required: true, message: 'teacher_id is required', trigger: 'blur' }]
                 },
                 selectClass: {},
@@ -225,7 +220,6 @@
                     title: '',
                     cover: '',
                     class_id: '',
-                    video_id: '',
                     teacher_id: ''
                 }
             },
@@ -316,8 +310,11 @@
                 return sort == 0 ? 'ascending' : 'descending';
             },
             handleImageSuccess(file) {
-                this.temp.cover = 'http://localhost/api/' + file.saveName;
+                this.temp.cover = 'http://localhost/api/' + file.data.saveName;
                 //console.log(file);
+            },
+            rmImage(){
+                this.temp.cover = '';
             }
         }
     }

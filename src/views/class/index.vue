@@ -104,7 +104,7 @@
                     page: 1,
                     limit: 20,
                     status: 1,
-                    sort: 1
+                    sort1: 1
                 },
                 showReviewer: false,
                 temp: {
