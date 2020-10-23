@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function getUser(query) {
+  return request({
+    url: '/admin/user/getUser',
+    method: 'get',
+    params: query
+  })
+}
 export function login(data) {
   return request({
     url: '/admin/user/login',
