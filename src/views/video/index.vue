@@ -46,7 +46,7 @@
                 </el-form-item>
                 <el-form-item label="所属课程" prop="course_id">
                     <el-select v-model="temp.course_id" placeholder="选择关联课程">
-                    <el-option v-for="items in selectCourses" :key="items.id" :label="items.title" :value="items.id" />
+                    <el-option v-for="items in selectCourse" :key="items.id" :label="items.title" :value="items.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="授课老师" prop="teacher_id">
@@ -142,11 +142,6 @@ import { setTimeout } from 'timers';
         computed:{
             typePro: function(){
                 return this.typeProCode ? 'showPro' : 'hidePro';
-            },
-            selectCourses: function(){
-                console.log(this.temp.class_id)
-                //this.getSelectCourse(this.temp.class_id);
-                return this.selectCourse;
             }
         },
         methods: {
