@@ -42,11 +42,6 @@
                     <span>{{ row.class_name }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="视频" width="110px" align="center">
-                <template slot-scope="{row}">
-                    <span></span>
-                </template>
-            </el-table-column>
             <el-table-column label="授课老师" width="110px" align="center">
                 <template slot-scope="{row}">
                     <span>{{ row.teacher_name }}</span>

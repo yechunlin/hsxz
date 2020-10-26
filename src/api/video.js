@@ -7,3 +7,17 @@ export function getVideo(params) {
     params
   })
 }
+export function addVideo(data) {
+  return request({
+    url: '/Video/addVideo',
+    method: 'post',
+    data
+  })
+}
+export function updateVideo(data) {
+  return request({
+    url: '/Video/updateVideo',
+    method: 'post',
+    data
+  })
+}

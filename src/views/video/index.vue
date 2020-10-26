@@ -11,7 +11,57 @@
                 添加
             </el-button>
         </div>
-
+        <el-table
+                :key="tableKey"
+                v-loading="listLoading"
+                :data="list"
+                border
+                fit
+                highlight-current-row
+                style="width: 100%;"
+                @sort-change="sortChange"
+        >
+            <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortCourse('id')">
+                <template slot-scope="{row}">
+                    <span>{{ row.id }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="视频" >
+                <template slot-scope="{row}">
+                    <video :src="row.path" controls style="width:270px;max-height:180px"></video>
+                </template>
+            </el-table-column>
+            <el-table-column label="所属班级" width="170px" align="center">
+                <template slot-scope="{row}">
+                    <span>{{ row.class_name }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="所属课程" width="170px" align="center">
+                <template slot-scope="{row}">
+                    <span>{{ row.course_name }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="上传时间" width="170px" align="center">
+                <template slot-scope="{row}">
+                    <span>{{ row.dated }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建者" width="110px" align="center">
+                <template slot-scope="{row}">
+                    <span>{{ row.admin_name }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+                <template slot-scope="{row,$index}">
+                    <el-button type="primary" size="mini" @click="handleUpdate(row)">
+                        编辑
+                    </el-button>
+                    <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
+                        删除
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
         <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getVideoList" />
 
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
@@ -40,18 +90,13 @@
                 </el-form-item>
                 
                 <el-form-item label="所属班级" prop="class_id">
-                    <el-select v-model="temp.class_id" placeholder="选择关联班级">
+                    <el-select v-model="temp.class_id" placeholder="选择关联班级" @change="classIdChange(temp.class_id)">
                     <el-option v-for="items in selectClass" :key="items.id" :label="items.name" :value="items.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所属课程" prop="course_id">
                     <el-select v-model="temp.course_id" placeholder="选择关联课程">
                     <el-option v-for="items in selectCourse" :key="items.id" :label="items.title" :value="items.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="授课老师" prop="teacher_id">
-                    <el-select v-model="temp.teacher_id" placeholder="选择授课老师">
-                    <el-option v-for="items in selectTeacher" :key="items.id" :label="items.username" :value="items.id" />
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -72,7 +117,7 @@
     import { getCourse} from '@/api/course'
     import { getClass } from '@/api/class'
     import { getUser } from '@/api/user'
-    import { getVideo } from '@/api/video'
+    import { getVideo, addVideo } from '@/api/video'
     import waves from '@/directive/waves' // waves directive
     import { parseTime } from '@/utils'
     import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -99,8 +144,7 @@ import { setTimeout } from 'timers';
                 temp: {
                     path: '',
                     class_id: '',
-                    course_id: '',
-                    teacher_id: ''
+                    course_id: ''
                 },
                 dialogFormVisible: false,
                 dialogStatus: '',
@@ -112,8 +156,7 @@ import { setTimeout } from 'timers';
                 rules: {
                     patch: [{ required: true, message: 'title is required', trigger: 'blur' }],
                     class_id: [{ required: true, message: 'class_id is required', trigger: 'blur' }],
-                    course_id: [{ required: true, message: 'course_id is required', trigger: 'blur' }],
-                    teacher_id: [{ required: true, message: 'teacher_id is required', trigger: 'blur' }]
+                    course_id: [{ required: true, message: 'course_id is required', trigger: 'blur' }]
                 },
                 selectClass: {},
                 selectCourse: {},
@@ -186,8 +229,7 @@ import { setTimeout } from 'timers';
                 this.temp = {
                     path: '',
                     class_id: '',
-                    course_id: '',
-                    teacher_id:''
+                    course_id: ''
                 }
             },
             handleCreate() {
@@ -195,9 +237,7 @@ import { setTimeout } from 'timers';
                 if(JSON.stringify(this.selectClass) == '{}'){
                     this.getSelectClass();
                 }
-                if(JSON.stringify(this.selectTeacher) == '{}'){
-                    this.getSelectTeacher();
-                }
+                this.selectCourse = {}
                 this.dialogStatus = 'create'
                 this.dialogFormVisible = true
                 this.$nextTick(() => {
@@ -208,7 +248,7 @@ import { setTimeout } from 'timers';
                 this.$refs['dataForm'].validate((valid) => {
                     if (valid) {
                         this.temp.admin_id = 1;//admin_id
-                        addCourse(this.temp).then((response) => {
+                        addVideo(this.temp).then((response) => {
                             this.list.unshift(response.data)
                             this.dialogFormVisible = false
                             this.$notify({
@@ -222,9 +262,13 @@ import { setTimeout } from 'timers';
                 })
             },
             handleUpdate(row) {
+                if(JSON.stringify(this.selectClass) == '{}'){
+                    this.getSelectClass();
+                }
                 this.temp = Object.assign({}, row) // copy obj
                 this.dialogStatus = 'update'
                 this.dialogFormVisible = true
+                this.getSelectCourse(this.temp.class_id);
                 this.$nextTick(() => {
                     this.$refs['dataForm'].clearValidate()
                 })
@@ -258,6 +302,9 @@ import { setTimeout } from 'timers';
                     this.list.splice(index, 1)
                 })
             },
+            classIdChange: function(res){
+                this.getSelectCourse(res);
+            },
             getSelectClass: function(){
                 getClass({
                     limit: 100
@@ -265,19 +312,12 @@ import { setTimeout } from 'timers';
                     this.selectClass = response.data.items
                 })
             },
-            getSelectCourse: function(course_id){
+            getSelectCourse: function(class_id){
                 getCourse({
-                    class_id: course_id,
+                    class_id: class_id,
                     limit: 100
                 }).then(response => {
                     this.selectCourse = response.data.items
-                })
-            },
-            getSelectTeacher: function(){
-                getUser({
-                    limit: 100
-                }).then(response => {
-                    this.selectTeacher = response.data.items
                 })
             },
             getSortCourse: function(key) {
