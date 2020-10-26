@@ -16,36 +16,37 @@
 
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
             <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 800px; margin-left:50px;">
-                <el-form-item label="课程名称" prop="title">
-                    <el-input v-model="temp.title" />
-                </el-form-item>
-                <el-form-item label="封面图" prop="cover">
+                <el-form-item label="视频" prop="path">
                         <div class="image-preview">
                             <div class="image-preview-wrapper">
-                                <img :src="temp.cover">
-                                <div class="image-preview-action">
-                                <i class="el-icon-delete" @click="rmImage"/>
-                                </div>
+                                <video :src="temp.path" controls style="width:270px;max-height:180px"></video>
                             </div>
                         </div>
                         <el-upload
-                        :data="{}"
-                        :multiple="false"
+                        multiple
                         :show-file-list="false"
-                        :on-success="handleImageSuccess"
+                        :auto-upload="false"
+                        :on-change="(file) => {videoUploadAction(file)}"
                         class="image-uploader"
                         drag
                         action="http://localhost/api/public/index.php/Upload/execAction"
                         >
                         <i class="el-icon-upload" />
                         <div class="el-upload__text">
-                            将图片拖到此处，或<em>点击上传</em>
+                            将视频拖到此处，或<em>点击上传</em>
                         </div>
                         </el-upload>
+                        <el-progress type="line" :percentage="percentage" :status="proStatus" :class="typePro"></el-progress>
                 </el-form-item>
+                
                 <el-form-item label="所属班级" prop="class_id">
                     <el-select v-model="temp.class_id" placeholder="选择关联班级">
                     <el-option v-for="items in selectClass" :key="items.id" :label="items.name" :value="items.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="所属课程" prop="course_id">
+                    <el-select v-model="temp.course_id" placeholder="选择关联课程">
+                    <el-option v-for="items in selectCourses" :key="items.id" :label="items.title" :value="items.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="授课老师" prop="teacher_id">
@@ -68,7 +69,7 @@
 </template>
 
 <script>
-    import { getCourse, addCourse, updateCourse, deleteCourse } from '@/api/course'
+    import { getCourse} from '@/api/course'
     import { getClass } from '@/api/class'
     import { getUser } from '@/api/user'
     import { getVideo } from '@/api/video'
@@ -76,12 +77,12 @@
     import { parseTime } from '@/utils'
     import Pagination from '@/components/Pagination' // secondary package based on el-pagination
     import ImageCropper from '@/components/ImageCropper'
+import { setTimeout } from 'timers';
 
     export default {
         name: 'videoList',
         components: { Pagination, ImageCropper },
         directives: { waves },
-
         data() {
             return {
                 tableKey: 0,
@@ -115,11 +116,38 @@
                     teacher_id: [{ required: true, message: 'teacher_id is required', trigger: 'blur' }]
                 },
                 selectClass: {},
-                selectTeacher: {}
+                selectCourse: {},
+                selectTeacher: {},
+
+                fileObject: null,
+                fileName: 'file',//input标签name属性名称
+                fileIdName: '', //input标签id属性名称
+                saveFileName: '',//服务端保存文件名
+                saveFileExtention: '',//服务端保存文件后缀名
+                saveFileType: '',//服务端保存文件类型
+                uploadFileObj: null, //获取文件对象
+                chunkSize: 1*1024*1024, //分片文件大小 1M
+                uploadChunkNum: 0, //计算需要上传多少次，方便显示进度
+                uploadTimes: 0, //用于进度显示，当前属于哪一次
+                httpRequestUrl: 'http://localhost/api/public/index.php/Upload/execActionBlod',// 服务端api
+                fileStart: 0, // 分片进度
+                percentage: 0, //进度
+                proStatus: 'warning',
+                typeProCode: 0
             }
         },
         created() {
             this.getVideoList();
+        },
+        computed:{
+            typePro: function(){
+                return this.typeProCode ? 'showPro' : 'hidePro';
+            },
+            selectCourses: function(){
+                console.log(this.temp.class_id)
+                //this.getSelectCourse(this.temp.class_id);
+                return this.selectCourse;
+            }
         },
         methods: {
             getVideoList() {
@@ -161,10 +189,10 @@
             },
             resetTemp() {
                 this.temp = {
-                    title: '',
-                    cover: '',
+                    path: '',
                     class_id: '',
-                    teacher_id: ''
+                    course_id: '',
+                    teacher_id:''
                 }
             },
             handleCreate() {
@@ -242,6 +270,14 @@
                     this.selectClass = response.data.items
                 })
             },
+            getSelectCourse: function(course_id){
+                getCourse({
+                    class_id: course_id,
+                    limit: 100
+                }).then(response => {
+                    this.selectCourse = response.data.items
+                })
+            },
             getSelectTeacher: function(){
                 getUser({
                     limit: 100
@@ -253,12 +289,109 @@
                 const sort = this.listQuery.sort
                 return sort == 0 ? 'ascending' : 'descending';
             },
-            handleImageSuccess(file) {
-                this.temp.cover = 'http://localhost/api/' + file.data.saveName;
-                //console.log(file);
+            videoUploadAction(file){
+                //获取到选中的文件
+                this.fileObject = file.raw;
+                //多次在同一个input上选择文件，当取消时，会出现file为undefined
+                if(typeof(this.fileObject) == 'undefined') return ;
+                
+                this.uploadChunkNum = Math.ceil(this.fileObject.size/this.chunkSize);
+                var index = this.fileObject.name.lastIndexOf('.');
+                this.saveFileExtention = this.fileObject.name.substring(index + 1);//获取文件后缀
+                this.saveFileType = this.fileObject.type;//获取文件类型
+                //通报.开始上传
+                this.uploadStart({
+                    'fileName' : this.fileObject.name,
+                    'fileSize' : this.fileObject.size,
+                    'fileType' : this.fileObject.type
+                });
+                this.typeProCode = 1;
+                //进行文件上传
+                this.execUpload();
             },
-            rmImage(){
-                this.temp.cover = '';
+            init(){
+                this.uploadTimes = 0;
+                this.fileStart = 0;
+                this.saveFileName = '';
+                this.saveFileExtention = '';
+                this.saveFileType = '';
+	        },
+            execUpload(){
+                var that = this;
+                //先声明一个异步请求对象
+                var xmlHttpReg = null;
+                if (window.ActiveXObject) {
+                    xmlHttpReg = new ActiveXObject("Microsoft.XMLHTTP");
+                } else if (window.XMLHttpRequest) {
+                    xmlHttpReg = new XMLHttpRequest(); 
+                }
+                if(this.fileStart < this.fileObject.size){
+                    //切片
+                    var blob = this.fileObject.slice(this.fileStart, this.fileStart + this.chunkSize);
+                    this.fileStart = this.fileStart + blob.size;
+                    //创建formdata对象
+                    var formData = new FormData();
+                    formData.append(this.fileName,blob);//文件包
+                    formData.append('get_file_name',this.fileName);//file的name属性名
+                    formData.append('save_file_name',this.saveFileName);//服务端保存文件名
+                    formData.append('save_file_extention',this.saveFileExtention);//扩展名
+                    formData.append('save_file_type',this.saveFileType);//文件类型
+                    if(this.fileStart >= this.fileObject.size){
+                        //最后一次片包，通知服务端
+                        formData.append('save_file_chunk_last',1);//文件类型
+                    }
+
+                    //如果实例化成功,就调用open()方法,就开始准备向服务器发送请求
+                    if (xmlHttpReg != null) {
+                        xmlHttpReg.open('post', this.httpRequestUrl, true);
+                        //xmlHttpReg.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+                        xmlHttpReg.send(formData);//传参
+                        xmlHttpReg.onreadystatechange =  function () {
+                            if (xmlHttpReg.readyState == 4 && xmlHttpReg.status == 200) { 
+                                    var data = JSON.parse(xmlHttpReg.response);//对返回数据做对象转换
+                                    console.log(data)
+                                    if(data.status == 1){
+                                        //通报.上传进度
+                                        that.progress({
+                                            'size' : that.fileObject.size,
+                                            'needUploadNum' : that.uploadChunkNum,
+                                            'thisTurn' : ++that.uploadTimes,
+                                            'havefinished' : (that.fileStart/that.fileObject.size) * 100
+                                        });
+                                        
+                                        that.saveFileName = data.data.saveFileName;
+                                        if(that.fileStart >= that.fileObject.size){
+                                            //通报.上传完成
+                                            that.uploadSuccess(data.data);
+                                        }
+                                        //递归，持续上传
+                                        that.execUpload();
+                                    }
+                            }
+                        }
+                    }
+                }else{
+                    this.init();
+                }
+            },
+            uploadStart(data){
+                //console.log(data)
+            },
+            progress(data){
+                //console.log(data)
+                this.percentage = data.havefinished;
+            },
+            uploadSuccess(data){
+                //console.log(data)
+                var that = this;
+                this.proStatus = 'success';
+                this.temp.path = 'http://localhost/api/' + data.saveFilePath + data.saveFileName;
+                setTimeout(function(){
+                    that.typeProCode = 0;
+                }, 1000);
+            },
+            rmVideo(){
+                this.temp.path = '';
             }
         }
     }
@@ -311,5 +444,10 @@ float: left;
         }
     }
 }
-    
+.showPro{
+    display:block;
+}
+.hidePro{
+    display:none
+}
 </style>
