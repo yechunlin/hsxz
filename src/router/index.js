@@ -68,6 +68,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/timetable',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'timetable',
+        component: () => import('@/views/timetable/index'),
+        meta: { title: '课程表', icon: 'table' }
+      }
+    ]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
@@ -90,42 +102,20 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
-
   {
-    path: '/example',
+    path: '/profile',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
-    children: [
-      {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
+    redirect: '/profile/index',
+    hidden: true,
     children: [
       {
         path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        component: () => import('@/views/profile/index'),
+        name: 'Profile',
+        meta: { title: '用户中心', icon: 'user', noCache: true }
       }
     ]
   },
-
   {
     path: '/nested',
     component: Layout,
@@ -181,17 +171,6 @@ export const constantRoutes = [
         component: () => import('@/views/nested/menu2/index'),
         name: 'Menu2',
         meta: { title: 'menu2' }
-      }
-    ]
-  },
-
-  {
-    path: 'external-link',
-    component: Layout,
-    children: [
-      {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
       }
     ]
   },

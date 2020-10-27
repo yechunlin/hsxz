@@ -21,3 +21,10 @@ export function updateVideo(data) {
     data
   })
 }
+export function deleteVideo(data) {
+  return request({
+    url: '/Video/deleteVideo',
+    method: 'post',
+    data
+  })
+}

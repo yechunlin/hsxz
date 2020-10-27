@@ -36,7 +36,7 @@
                     <span>{{ row.class_name }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="所属课程" width="170px" align="center">
+            <el-table-column label="所属课程" width="250px" align="center">
                 <template slot-scope="{row}">
                     <span>{{ row.course_name }}</span>
                 </template>
@@ -117,7 +117,7 @@
     import { getCourse} from '@/api/course'
     import { getClass } from '@/api/class'
     import { getUser } from '@/api/user'
-    import { getVideo, addVideo } from '@/api/video'
+    import { getVideo, addVideo, deleteVideo } from '@/api/video'
     import waves from '@/directive/waves' // waves directive
     import { parseTime } from '@/utils'
     import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -292,7 +292,7 @@ import { setTimeout } from 'timers';
                 })
             },
             handleDelete(row, index) {
-                deleteCourse({id: row.id}).then((response) => {
+                deleteVideo({id: row.id}).then((response) => {
                     this.$notify({
                         title: 'Success',
                         message: 'Delete Successfully',
