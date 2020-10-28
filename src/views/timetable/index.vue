@@ -149,7 +149,7 @@
             getTimeTableList() {
                 this.listLoading = true
                 getTimeTable(this.listQuery).then(response => {
-                    console.log(response.data);
+                    //console.log(response.data);
                     this.list = response.data.items
                     this.total = response.data.total
                     // Just to simulate the time of the request

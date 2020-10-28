@@ -13,7 +13,7 @@
               <el-tab-pane label="Activity" name="activity">
                 <activity />
               </el-tab-pane>
-              <el-tab-pane label="Timeline" name="timeline">
+              <el-tab-pane label="操作日志" name="timeline">
                 <timeline />
               </el-tab-pane>
               <el-tab-pane label="Account" name="account">
@@ -48,7 +48,7 @@ export default {
     ...mapGetters([
       'username',
       'avatar',
-      'roles'
+      'id'
     ])
   },
   created() {
@@ -58,9 +58,8 @@ export default {
     getUser() {
       this.user = {
         username: this.username,
-        role: this.roles.join(' | '),
-        email: 'admin@test.com',
-        avatar: this.avatar
+        avatar: this.avatar,
+        id: this.id
       }
     }
   }

@@ -14,7 +14,6 @@ export function login(data) {
     data
   })
 }
-
 export function getInfo(token) {
   return request({
     url: '/admin/user/info',
@@ -22,10 +21,16 @@ export function getInfo(token) {
     params: { token }
   })
 }
-
 export function logout() {
   return request({
     url: '/admin/user/logout',
     method: 'post'
+  })
+}
+export function updateUser(data) {
+  return request({
+    url: '/admin/user/updateUser',
+    method: 'post',
+    data
   })
 }

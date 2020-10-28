@@ -17,24 +17,19 @@ export default {
     return {
       timeline: [
         {
-          timestamp: '2019/4/20',
-          title: 'Update Github template',
-          content: 'PanJiaChen committed 2019/4/20 20:46'
+          timestamp: '2020-10-28 20:46:22',
+          title: '修改',
+          content: '用户中心去掉角色描述'
         },
         {
-          timestamp: '2019/4/21',
-          title: 'Update Github template',
-          content: 'PanJiaChen committed 2019/4/21 20:46'
+          timestamp: '2020-10-27 17:21:47',
+          title: '添加',
+          content: '添加班级水彩笔绘画'
         },
         {
-          timestamp: '2019/4/22',
-          title: 'Build Template',
-          content: 'PanJiaChen committed 2019/4/22 20:46'
-        },
-        {
-          timestamp: '2019/4/23',
-          title: 'Release New Version',
-          content: 'PanJiaChen committed 2019/4/23 20:46'
+          timestamp: '2020-10-26 18:01:39',
+          title: '删除',
+          content: '删除上传的测试视频'
         }
       ]
     }
