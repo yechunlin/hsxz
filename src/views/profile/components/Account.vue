@@ -11,7 +11,7 @@
         :width="300"
         :height="300"
         field="file"
-        url="http://localhost/api/public/index.php/Upload/execAction"
+        url="http://localhost/api/public/index.php/admin/Upload/execAction"
         lang-type="zh"
         @close="close"
         @crop-upload-success="cropSuccess"

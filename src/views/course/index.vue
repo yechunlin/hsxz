@@ -87,7 +87,7 @@
                         :on-success="handleImageSuccess"
                         class="image-uploader"
                         drag
-                        action="http://localhost/api/public/index.php/Upload/execAction"
+                        action="http://localhost/api/public/index.php/admin/Upload/execAction"
                         >
                         <i class="el-icon-upload" />
                         <div class="el-upload__text">

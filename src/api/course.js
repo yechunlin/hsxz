@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getCourse(query) {
   return request({
-    url: '/Course/getCourse',
+    url: 'admin/Course/getCourse',
     method: 'get',
     params: query
   })
@@ -10,7 +10,7 @@ export function getCourse(query) {
 
 export function getCourseInfo(id) {
   return request({
-    url: 'Course/getCourseInfo',
+    url: 'admin/Course/getCourseInfo',
     method: 'get',
     params: { id }
   })
@@ -18,7 +18,7 @@ export function getCourseInfo(id) {
 
 export function addCourse(data) {
   return request({
-    url: 'Course/addCourse',
+    url: 'admin/Course/addCourse',
     method: 'post',
     data
   })
@@ -26,7 +26,7 @@ export function addCourse(data) {
 
 export function deleteCourse(data) {
   return request({
-    url: '/Course/deleteCourse',
+    url: 'admin/Course/deleteCourse',
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export function deleteCourse(data) {
 
 export function updateCourse(data) {
   return request({
-    url: '/Course/updateCourse',
+    url: 'admin/Course/updateCourse',
     method: 'post',
     data
   })

@@ -2,28 +2,28 @@ import request from '@/utils/request'
 
 export function getTimeTable(params) {
   return request({
-    url: '/Timetable/getTimeTable',
+    url: 'admin/Timetable/getTimeTable',
     method: 'get',
     params
   })
 }
 export function addTimeTable(data) {
   return request({
-    url: '/Timetable/addTimeTable',
+    url: 'admin/Timetable/addTimeTable',
     method: 'post',
     data
   })
 }
 export function updateTimeTable(data) {
   return request({
-    url: '/Timetable/updateTimeTable',
+    url: 'admin/Timetable/updateTimeTable',
     method: 'post',
     data
   })
 }
 export function deleteTimeTable(data) {
   return request({
-    url: '/Timetable/deleteTimeTable',
+    url: 'admin/Timetable/deleteTimeTable',
     method: 'post',
     data
   })

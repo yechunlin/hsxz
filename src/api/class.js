@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getClass(query) {
   return request({
-    url: '/Class/getClass',
+    url: 'admin/Class/getClass',
     method: 'get',
     params: query
   })
@@ -10,7 +10,7 @@ export function getClass(query) {
 
 export function getClassInfo(id) {
   return request({
-    url: 'Class/getClassInfo',
+    url: 'admin/Class/getClassInfo',
     method: 'get',
     params: { id }
   })
@@ -18,7 +18,7 @@ export function getClassInfo(id) {
 
 export function addClass(data) {
   return request({
-    url: 'Class/addClass',
+    url: 'admin/Class/addClass',
     method: 'post',
     data
   })
@@ -26,7 +26,7 @@ export function addClass(data) {
 
 export function deleteClass(data) {
   return request({
-    url: '/Class/deleteClass',
+    url: 'admin/Class/deleteClass',
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export function deleteClass(data) {
 
 export function updateClass(data) {
   return request({
-    url: '/Class/updateClass',
+    url: 'admin/Class/updateClass',
     method: 'post',
     data
   })
