@@ -66,23 +66,21 @@ service.interceptors.response.use(
           })
         })
       }
-      if(res.code === 4003 || res.code === 4005){
-        store.dispatch('user/login').then(() => {
-          location.reload()
-        })
-      }
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
       return res
     }
   },
   error => {
-    console.log(error) // for debug
+    console.log(error.response) // for debug
     Message({
-      message: error.message,
+      message: error.response.data.msg,
       type: 'error',
       duration: 2 * 1000
     })
+    if(error.response.status == 403){
+      location.reload()
+    }
     return Promise.reject(error)
   }
 )
