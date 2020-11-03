@@ -176,7 +176,6 @@
             getCourseList() {
                 this.listLoading = true
                 getCourse(this.listQuery).then(response => {
-                    console.log(response.data);
                     this.list = response.data.items
                     this.total = response.data.total
                     // Just to simulate the time of the request
@@ -235,7 +234,7 @@
             createData() {
                 this.$refs['dataForm'].validate((valid) => {
                     if (valid) {
-                        this.temp.admin_id = 1;//admin_id
+                        this.temp.admin_id = this.$store.getters.id;//admin_id
                         addCourse(this.temp).then((response) => {
                             this.list.unshift(response.data)
                             this.dialogFormVisible = false

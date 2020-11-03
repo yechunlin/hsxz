@@ -202,7 +202,7 @@
             createData() {
                 this.$refs['dataForm'].validate((valid) => {
                     if (valid) {
-                        this.temp.admin_id = 1;
+                        this.temp.admin_id = this.$store.getters.id;
                         addTimeTable(this.temp).then((response) => {
                             this.list.unshift(response.data)
                             this.dialogFormVisible = false

@@ -28,7 +28,7 @@
             </el-table-column>
             <el-table-column label="视频" >
                 <template slot-scope="{row}">
-                    <video :src="row.path" controls style="width:270px;max-height:180px"></video>
+                    <video :src="row.path" controls style="width:270px;max-height:150px"></video>
                 </template>
             </el-table-column>
             <el-table-column label="所属班级" width="170px" align="center">
@@ -36,7 +36,7 @@
                     <span>{{ row.class_name }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="所属课程" width="250px" align="center">
+            <el-table-column label="所属课程" width="280px" align="center">
                 <template slot-scope="{row}">
                     <span>{{ row.course_name }}</span>
                 </template>
@@ -79,7 +79,6 @@
                         :on-change="(file) => {videoUploadAction(file)}"
                         class="image-uploader"
                         drag
-                        action="http://localhost/api/public/index.php/Upload/execAction"
                         >
                         <i class="el-icon-upload" />
                         <div class="el-upload__text">
@@ -172,7 +171,7 @@ import { setTimeout } from 'timers';
                 chunkSize: 1*1024*1024, //分片文件大小 1M
                 uploadChunkNum: 0, //计算需要上传多少次，方便显示进度
                 uploadTimes: 0, //用于进度显示，当前属于哪一次
-                httpRequestUrl: 'http://localhost/api/public/index.php/Upload/execActionBlod',// 服务端api
+                httpRequestUrl: 'http://localhost/api/public/index.php/admin/Upload/execActionBlod',// 服务端api
                 fileStart: 0, // 分片进度
                 percentage: 0, //进度
                 proStatus: 'warning',
@@ -191,7 +190,6 @@ import { setTimeout } from 'timers';
             getVideoList() {
                 this.listLoading = true
                 getVideo(this.listQuery).then(response => {
-                    console.log(response.data);
                     this.list = response.data.items
                     this.total = response.data.total
                     // Just to simulate the time of the request
@@ -247,7 +245,7 @@ import { setTimeout } from 'timers';
             createData() {
                 this.$refs['dataForm'].validate((valid) => {
                     if (valid) {
-                        this.temp.admin_id = 1;//admin_id
+                        this.temp.admin_id = this.$store.getters.id;//admin_id
                         addVideo(this.temp).then((response) => {
                             this.list.unshift(response.data)
                             this.dialogFormVisible = false
@@ -384,7 +382,6 @@ import { setTimeout } from 'timers';
                         xmlHttpReg.onreadystatechange =  function () {
                             if (xmlHttpReg.readyState == 4 && xmlHttpReg.status == 200) { 
                                     var data = JSON.parse(xmlHttpReg.response);//对返回数据做对象转换
-                                    console.log(data)
                                     if(data.status == 1){
                                         //通报.上传进度
                                         that.progress({
