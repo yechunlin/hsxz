@@ -249,6 +249,12 @@
                 })
             },
             handleUpdate(row) {
+                if(JSON.stringify(this.selectClass) == '{}'){
+                    this.getSelectClass();
+                }
+                if(JSON.stringify(this.selectTeacher) == '{}'){
+                    this.getSelectTeacher();
+                }
                 this.temp = Object.assign({}, row) // copy obj
                 this.dialogStatus = 'update'
                 this.dialogFormVisible = true
