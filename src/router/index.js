@@ -32,6 +32,18 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
+    path: '/cate',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'cate',
+        component: () => import('@/views/cate/index'),
+        meta: { title: '分类', icon: 'table' }
+      }
+    ]
+  },
+  {
     path: '/class',
     component: Layout,
     children: [

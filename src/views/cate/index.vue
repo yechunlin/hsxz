@@ -1,8 +1,8 @@
 <template>
     <div class="app-container">
         <div class="filter-container" style="margin:0 0 5px 0">
-            <el-input v-model="listQuery.id" placeholder="班级id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
-            <el-input v-model="listQuery.name" placeholder="班级名称" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="listQuery.id" placeholder="分类id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="listQuery.name" placeholder="分类名称" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
             </el-button>
@@ -21,7 +21,7 @@
                 style="width: 100%;"
                 @sort-change="sortChange"
         >
-            <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+            <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortCate('id')">
                 <template slot-scope="{row}">
                     <span>{{ row.id }}</span>
                 </template>
@@ -29,16 +29,6 @@
             <el-table-column label="名称" min-width="50px">
                 <template slot-scope="{row}">
                     <span class="link-type">{{ row.name }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="描述" min-width="100px">
-                <template slot-scope="{row}">
-                    <span class="link-type">{{ row.description }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="分类" min-width="50px">
-                <template slot-scope="{row}">
-                    <span class="link-type">{{ row.cate_name }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="日期" width="170px" align="center">
@@ -56,27 +46,19 @@
                     <el-button type="primary" size="mini" @click="handleUpdate(row)">
                         编辑
                     </el-button>
-                    <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
+                    <el-button size="mini" type="danger" @click="handleDelete(row,$index)">
                         删除
                     </el-button>
                 </template>
             </el-table-column>
         </el-table>
 
-        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getClassList" />
+        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getCateList" />
 
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
             <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="temp.name" />
-                </el-form-item>
-                <el-form-item label="描述" prop="description">
-                    <el-input v-model="temp.description" />
-                </el-form-item>
-                <el-form-item label="分类" prop="cate_id">
-                    <el-select v-model="temp.cate_id" placeholder="选择所属分类">
-                    <el-option v-for="items in selectCate" :key="items.id" :label="items.name" :value="items.id" />
-                    </el-select>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -93,8 +75,7 @@
 </template>
 
 <script>
-    import { getClass, addClass, updateClass, deleteClass } from '@/api/class'
-    import { getCate } from '@/api/cate'
+    import { getCate, addCate, updateCate, deleteCate } from '@/api/cate'
     import waves from '@/directive/waves' // waves directive
     import { parseTime } from '@/utils'
     import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -119,9 +100,7 @@
                 },
                 showReviewer: false,
                 temp: {
-                    name: '',
-                    description: '',
-                    cate_id: 0
+                    name: ''
                 },
                 dialogFormVisible: false,
                 dialogStatus: '',
@@ -131,21 +110,18 @@
                 },
                 dialogPvVisible: false,
                 rules: {
-                    description: [{ required: true, message: 'description is required', trigger: 'blur' }],
-                    name: [{ required: true, message: 'name is required', trigger: 'blur' }],
-                    cate_id: [{ required: true, message: 'cate_id is required', trigger: 'blur' }]
+                    name: [{ required: true, message: 'name is required', trigger: 'blur' }]
                 },
-                downloadLoading: false,
-                selectCate: {}
+                downloadLoading: false
             }
         },
         created() {
-            this.getClassList();
+            this.getCateList();
         },
         methods: {
-            getClassList() {
+            getCateList() {
                 this.listLoading = true
-                getClass(this.listQuery).then(response => {
+                getCate(this.listQuery).then(response => {
                     this.list = response.data.items
                     this.total = response.data.total
                     // Just to simulate the time of the request
@@ -156,7 +132,7 @@
             },
             handleFilter() {
                 this.listQuery.page = 1
-                this.getClassList()
+                this.getCateList()
             },
             handleModifyStatus(row, status) {
                 this.$message({
@@ -182,15 +158,11 @@
             resetTemp() {
                 this.temp = {
                     name: '',
-                    description: '',
-                    cate_id: 0
+                    description: ''
                 }
             },
             handleCreate() {
                 this.resetTemp()
-                if(JSON.stringify(this.selectCate) == '{}'){
-                    this.getSelectCate();
-                }
                 this.dialogStatus = 'create'
                 this.dialogFormVisible = true
                 this.$nextTick(() => {
@@ -201,7 +173,7 @@
                 this.$refs['dataForm'].validate((valid) => {
                     if (valid) {
                         this.temp.admin_id = this.$store.getters.id;
-                        addClass(this.temp).then((response) => {
+                        addCate(this.temp).then((response) => {
                             response.data.admin_name = this.$store.getters.username
                             this.list.unshift(response.data)
                             this.dialogFormVisible = false
@@ -216,9 +188,6 @@
                 })
             },
             handleUpdate(row) {
-                if(JSON.stringify(this.selectCate) == '{}'){
-                    this.getSelectCate();
-                }
                 this.temp = Object.assign({}, row) // copy obj
                 this.dialogStatus = 'update'
                 this.dialogFormVisible = true
@@ -230,9 +199,8 @@
                 this.$refs['dataForm'].validate((valid) => {
                     if (valid) {
                         const tempData = Object.assign({}, this.temp)
-                        updateClass(tempData).then((response) => {
+                        updateCate(tempData).then((response) => {
                             const index = this.list.findIndex(v => v.id === this.temp.id)
-                            this.temp.cate_name = response.data.cate_name
                             this.list.splice(index, 1, this.temp)
                             this.dialogFormVisible = false
                             this.$notify({
@@ -246,7 +214,7 @@
                 })
             },
             handleDelete(row, index) {
-                deleteClass({id: row.id}).then((response) => {
+                deleteCate({id: row.id}).then((response) => {
                     this.$notify({
                         title: 'Success',
                         message: 'Delete Successfully',
@@ -256,17 +224,10 @@
                     this.list.splice(index, 1)
                 })
             },
-            getSortClass: function(key) {
+            getSortCate: function(key) {
                 const sort = this.listQuery.sort
                 return sort == 0 ? 'ascending' : 'descending'
-            },
-            getSelectCate: function(){
-                getCate({
-                    limit: 100
-                }).then(response => {
-                    this.selectCate = response.data.items
-                })
-            },
+            }
         }
     }
 </script>
