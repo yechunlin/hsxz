@@ -68,18 +68,6 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/video',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'video',
-        component: () => import('@/views/video/index'),
-        meta: { title: '视频', icon: 'table' }
-      }
-    ]
-  },
-  {
     path: '/timetable',
     component: Layout,
     children: [

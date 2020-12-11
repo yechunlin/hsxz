@@ -3,6 +3,9 @@
         <div class="filter-container" style="margin:0 0 5px 0">
             <el-input v-model="listQuery.id" placeholder="班级id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-input v-model="listQuery.name" placeholder="班级名称" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-select v-model="listQuery.cate_id" placeholder="分类" clearable class="filter-item" style="margin-left: 10px;width: 130px">
+                <el-option v-for="item in selectCate" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
+            </el-select>
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
             </el-button>
@@ -29,11 +32,6 @@
             <el-table-column label="名称" min-width="50px">
                 <template slot-scope="{row}">
                     <span class="link-type">{{ row.name }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="描述" min-width="100px">
-                <template slot-scope="{row}">
-                    <span class="link-type">{{ row.description }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="分类" min-width="50px">
@@ -70,12 +68,9 @@
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="temp.name" />
                 </el-form-item>
-                <el-form-item label="描述" prop="description">
-                    <el-input v-model="temp.description" />
-                </el-form-item>
                 <el-form-item label="分类" prop="cate_id">
-                    <el-select v-model="temp.cate_id" placeholder="选择所属分类">
-                    <el-option v-for="items in selectCate" :key="items.id" :label="items.name" :value="items.id" />
+                    <el-select v-model="temp.cate_id" placeholder="选择所属分类" clearable>
+                        <el-option v-for="items in selectCate" :key="items.id" :label="items.name" :value="items.id" />
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -120,8 +115,7 @@
                 showReviewer: false,
                 temp: {
                     name: '',
-                    description: '',
-                    cate_id: 0
+                    cate_id: ''
                 },
                 dialogFormVisible: false,
                 dialogStatus: '',
@@ -131,7 +125,6 @@
                 },
                 dialogPvVisible: false,
                 rules: {
-                    description: [{ required: true, message: 'description is required', trigger: 'blur' }],
                     name: [{ required: true, message: 'name is required', trigger: 'blur' }],
                     cate_id: [{ required: true, message: 'cate_id is required', trigger: 'blur' }]
                 },
@@ -141,6 +134,9 @@
         },
         created() {
             this.getClassList();
+            if(JSON.stringify(this.selectCate) == '{}'){
+                this.getSelectCate();
+            }
         },
         methods: {
             getClassList() {
@@ -182,15 +178,11 @@
             resetTemp() {
                 this.temp = {
                     name: '',
-                    description: '',
-                    cate_id: 0
+                    cate_id: ''
                 }
             },
             handleCreate() {
                 this.resetTemp()
-                if(JSON.stringify(this.selectCate) == '{}'){
-                    this.getSelectCate();
-                }
                 this.dialogStatus = 'create'
                 this.dialogFormVisible = true
                 this.$nextTick(() => {
@@ -216,9 +208,6 @@
                 })
             },
             handleUpdate(row) {
-                if(JSON.stringify(this.selectCate) == '{}'){
-                    this.getSelectCate();
-                }
                 this.temp = Object.assign({}, row) // copy obj
                 this.dialogStatus = 'update'
                 this.dialogFormVisible = true

@@ -3,6 +3,9 @@
         <div class="filter-container" style="margin:0 0 5px 0">
             <el-input v-model="listQuery.id" placeholder="课程id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-input v-model="listQuery.title" placeholder="课程名称" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-select v-model="listQuery.class_id" placeholder="班级" clearable class="filter-item" style="margin-left: 10px;width: 130px">
+                <el-option v-for="item in selectClass" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
+            </el-select>
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
             </el-button>
@@ -101,26 +104,15 @@
                         </el-upload>
                 </el-form-item>
                 <el-form-item label="视频" prop="video">
-                        <div class="image-preview">
-                            <div class="image-preview-wrapper">
-                                <video :src="temp.video" controls style="width:270px;max-height:180px"></video>
-                            </div>
+                    <div class="image-preview">
+                        <div class="image-preview-wrapper">
+                            <video :src="temp.video" controls style="width:270px;max-height:180px"></video>
                         </div>
-                        <el-upload
-                        multiple
-                        :show-file-list="false"
-                        :auto-upload="false"
-                        :on-change="(file) => {videoUploadAction(file)}"
-                        class="image-uploader"
-                        action=""
-                        drag
-                        >
-                        <i class="el-icon-upload" />
-                        <div class="el-upload__text">
-                            将视频拖到此处，或<em>点击上传</em>
-                        </div>
-                        </el-upload>
-                        <el-progress type="line" :percentage="percentage" :status="proStatus" :class="typePro"></el-progress>
+                    </div>
+                    <div class="file">
+                        <input type="file" v-on:change="videoUploadAction($event)" />上传视频
+                    </div>
+                    <el-progress type="line" :percentage="percentage" :status="proStatus" :class="typePro"></el-progress>
                 </el-form-item>
                 <el-form-item label="所属班级" prop="class_id">
                     <el-select v-model="temp.class_id" placeholder="选择关联班级">
@@ -217,6 +209,9 @@
         },
         created() {
             this.getCourseList();
+            if(JSON.stringify(this.selectClass) == '{}'){
+                this.getSelectClass();
+            }
         },
         computed:{
             typePro: function(){
@@ -264,15 +259,16 @@
                 this.temp = {
                     title: '',
                     cover: '',
+                    video: '',
                     class_id: '',
                     teacher_id: ''
                 }
+                this.percentage = 0
+                this.proStatus = 'warning'
+                this.typeProCode = 0
             },
             handleCreate() {
                 this.resetTemp()
-                if(JSON.stringify(this.selectClass) == '{}'){
-                    this.getSelectClass();
-                }
                 if(JSON.stringify(this.selectTeacher) == '{}'){
                     this.getSelectTeacher();
                 }
@@ -300,9 +296,6 @@
                 })
             },
             handleUpdate(row) {
-                if(JSON.stringify(this.selectClass) == '{}'){
-                    this.getSelectClass();
-                }
                 if(JSON.stringify(this.selectTeacher) == '{}'){
                     this.getSelectTeacher();
                 }
@@ -369,7 +362,7 @@
             },
             videoUploadAction(file){
                 //获取到选中的文件
-                this.fileObject = file.raw;
+                this.fileObject = file.target.files[0];
                 //多次在同一个input上选择文件，当取消时，会出现file为undefined
                 if(typeof(this.fileObject) == 'undefined') return ;
                 
@@ -462,13 +455,13 @@
                 //console.log(data)
                 var that = this;
                 this.proStatus = 'success';
-                this.temp.path = 'http://localhost/api/' + data.saveFilePath + data.saveFileName;
+                this.temp.video = 'http://localhost/api/' + data.saveFilePath + data.saveFileName;
                 setTimeout(function(){
                     that.typeProCode = 0;
                 }, 1000);
             },
             rmVideo(){
-                this.temp.path = '';
+                this.temp.video = '';
             }
         }
     }
@@ -521,5 +514,24 @@ float: left;
         }
     }
 }
-    
+.file {
+    position: relative;
+    display: inline-block;
+    background: #409EFF;
+    border-radius: 4px;
+    padding: 4px 12px;
+    overflow: hidden;
+    color: #fff;
+    text-decoration: none;
+    text-indent: 0;
+    line-height: 20px;
+    cursor: pointer
+}
+.file input {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+}
 </style>
