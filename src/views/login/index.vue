@@ -13,7 +13,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="用户名"
           name="username"
           type="text"
           tabindex="1"
@@ -30,7 +30,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          placeholder="密码"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -54,7 +54,7 @@ export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (value.length < 1) {
         callback(new Error('Please enter the correct user name'))
       } else {
         callback()
@@ -69,7 +69,7 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
+        username: '叶春林',
         password: '123456'
       },
       loginRules: {

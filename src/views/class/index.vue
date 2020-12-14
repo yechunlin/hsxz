@@ -39,6 +39,11 @@
                     <span class="link-type">{{ row.cate_name }}</span>
                 </template>
             </el-table-column>
+            <el-table-column label="招生" min-width="50px">
+                <template slot-scope="{row}">
+                    <span class="link-type">{{ row.num }}</span>
+                </template>
+            </el-table-column>
             <el-table-column label="日期" width="170px" align="center">
                 <template slot-scope="{row}">
                     <span>{{ row.dated }}</span>
@@ -64,7 +69,7 @@
         <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getClassList" />
 
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-            <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+            <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="temp.name" />
                 </el-form-item>
@@ -72,6 +77,9 @@
                     <el-select v-model="temp.cate_id" placeholder="选择所属分类" clearable>
                         <el-option v-for="items in selectCate" :key="items.id" :label="items.name" :value="items.id" />
                     </el-select>
+                </el-form-item>
+                <el-form-item label="招生" prop="num">
+                    <el-input v-model="temp.num" />
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -115,7 +123,8 @@
                 showReviewer: false,
                 temp: {
                     name: '',
-                    cate_id: ''
+                    cate_id: '',
+                    num: ''
                 },
                 dialogFormVisible: false,
                 dialogStatus: '',
@@ -126,7 +135,8 @@
                 dialogPvVisible: false,
                 rules: {
                     name: [{ required: true, message: 'name is required', trigger: 'blur' }],
-                    cate_id: [{ required: true, message: 'cate_id is required', trigger: 'blur' }]
+                    cate_id: [{ required: true, message: 'cate_id is required', trigger: 'blur' }],
+                    num: [{ required: true, message: 'nu is required', trigger: 'blur' }]
                 },
                 downloadLoading: false,
                 selectCate: {}
@@ -178,7 +188,8 @@
             resetTemp() {
                 this.temp = {
                     name: '',
-                    cate_id: ''
+                    cate_id: '',
+                    num: ''
                 }
             },
             handleCreate() {
