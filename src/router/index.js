@@ -80,6 +80,30 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/user',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'user',
+        component: () => import('@/views/user/index'),
+        meta: { title: '用户', icon: 'table' }
+      }
+    ]
+  },
+  {
+    path: '/student',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'student',
+        component: () => import('@/views/student/index'),
+        meta: { title: '学生', icon: 'table' }
+      }
+    ]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true

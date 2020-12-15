@@ -7,6 +7,13 @@ export function getUser(query) {
     params: query
   })
 }
+export function addUser(data) {
+  return request({
+    url: 'admin/user/addUser',
+    method: 'post',
+    data
+  })
+}
 export function login(data) {
   return request({
     url: 'admin/user/login',
@@ -31,6 +38,13 @@ export function logout(data) {
 export function updateUser(data) {
   return request({
     url: 'admin/user/updateUser',
+    method: 'post',
+    data
+  })
+}
+export function deleteUser(data) {
+  return request({
+    url: 'admin/user/deleteUser',
     method: 'post',
     data
   })
