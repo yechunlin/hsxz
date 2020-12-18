@@ -6,20 +6,20 @@
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
             </el-button>
-            <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+            <el-button v-if="is_admin" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
                 添加
             </el-button>
         </div>
 
         <el-table
-                :key="tableKey"
-                v-loading="listLoading"
-                :data="list"
-                border
-                fit
-                highlight-current-row
-                style="width: 100%;"
-                @sort-change="sortChange"
+            :key="tableKey"
+            v-loading="listLoading"
+            :data="list"
+            border
+            fit
+            highlight-current-row
+            style="width: 100%;"
+            @sort-change="sortChange"
         >
             <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortUser('id')">
                 <template slot-scope="{row}">
@@ -51,7 +51,7 @@
                     <span>{{ row.lastdated }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+            <el-table-column v-if="is_admin" label="操作" align="center" width="230" class-name="small-padding fixed-width">
                 <template slot-scope="{row,$index}">
                     <el-button type="primary" size="mini" @click="handleUpdate(row)">
                         编辑
@@ -119,7 +119,8 @@
                 },
                 showReviewer: false,
                 temp: {
-                    username: ''
+                    username: '',
+                    phone: ''
                 },
                 dialogFormVisible: false,
                 dialogStatus: '',
@@ -130,11 +131,14 @@
                 dialogPvVisible: false,
                 rules: {
                     username: [{ required: true, message: 'name is required', trigger: 'blur' }],
-                    password: [{ required: true, message: 'password is required', trigger: 'blur' }],
-                    phone: [{ required: true, message: 'phone is required', trigger: 'blur' }],
-                    intro: [{ required: true, message: 'intro is required', trigger: 'blur' }]
+                    phone: [{ required: true, message: 'phone is required', trigger: 'blur' }]
                 },
                 downloadLoading: false
+            }
+        },
+        computed:{
+            is_admin:function () {
+                return this.$store.getters.id == 1 ? true : false;
             }
         },
         created() {

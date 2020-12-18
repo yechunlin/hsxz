@@ -72,16 +72,18 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log(error.response) // for debug
+    //console.log(error.response) // for debug
     Message({
       message: error.response.data.msg,
       type: 'error',
       duration: 2 * 1000
     })
     if(error.response.status == 403){
-      location.reload()
+      //location.reload()
+      this.$store.dispatch('user/logout')
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
-    return Promise.reject(error)
+    return Promise.reject(error)  
   }
 )
 

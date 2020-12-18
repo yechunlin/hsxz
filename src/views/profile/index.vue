@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import { getInfo } from '@/api/user'
 import { mapGetters } from 'vuex'
 import UserCard from './components/UserCard'
 import Activity from './components/Activity'
@@ -48,7 +49,10 @@ export default {
     ...mapGetters([
       'username',
       'avatar',
-      'id'
+      'phone',
+      'intro',
+      'id',
+      'userinfo'
     ])
   },
   created() {
@@ -56,11 +60,7 @@ export default {
   },
   methods: {
     getUser() {
-      this.user = {
-        username: this.username,
-        avatar: this.avatar,
-        id: this.id
-      }
+      this.user = this.userinfo
     }
   }
 }

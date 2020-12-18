@@ -17,8 +17,26 @@
         @crop-upload-success="cropSuccess"
       />
     </el-form-item>
-    <el-form-item label="昵称">
+    <el-form-item label="用户名">
       <el-input v-model.trim="user.username" />
+    </el-form-item>
+    <el-form-item label="电话">
+      <el-input v-model.trim="user.phone" />
+    </el-form-item>
+    <el-form-item label="密码">
+      <el-input v-model.trim="user.password" />
+    </el-form-item>
+    <el-form-item label="简介" v-if="user.type==1">
+      <el-input v-model.trim="user.intro" />
+    </el-form-item>
+    <el-form-item label="学校" v-if="user.type==2">
+      <el-input v-model.trim="user.school" />
+    </el-form-item>
+    <el-form-item label="年级" v-if="user.type==2">
+      <el-input v-model.trim="user.grade" />
+    </el-form-item>
+    <el-form-item label="地址" v-if="user.type==2">
+      <el-input v-model.trim="user.local" />
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submit">Update</el-button>
@@ -45,8 +63,13 @@ export default {
       default: () => {
         return {
           id:'',
-          name: '',
-          avatar: ''
+          username: '',
+          avatar: '',
+          phone: '',
+          intro: '',
+          school: '',
+          grade: '',
+          local: ''
         }
       }
     }
@@ -61,6 +84,9 @@ export default {
               type: 'success',
               duration: 2 * 1000
             })
+            if(response.data.hasOwnProperty("password")){
+                setTimeout(this.logout(), 2000);
+            } 
           }
       })
     },
@@ -73,6 +99,10 @@ export default {
     },
     close() {
       this.imagecropperShow = false
+    },
+    async logout() {
+      await this.$store.dispatch('user/logout')
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }
 }

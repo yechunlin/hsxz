@@ -13,11 +13,11 @@
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link to="/profile/index">
             <el-dropdown-item>
-              Home
+              主页
             </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided @click.native="logout">
-            <span style="display:block;">Log Out</span>
+            <span style="display:block;">退出</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
