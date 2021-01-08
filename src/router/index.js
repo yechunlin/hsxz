@@ -30,18 +30,12 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+
 export const constantRoutes = [
   {
-    path: '/cate',
+    path: '/',
     component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'cate',
-        component: () => import('@/views/cate/index'),
-        meta: { title: '分类', icon: 'table' }
-      }
-    ]
+    redirect: '/class/index'
   },
   {
     path: '/class',
@@ -56,71 +50,15 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/course',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'course',
-        component: () => import('@/views/course/index'),
-        meta: { title: '课程', icon: 'table' }
-      }
-    ]
-  },
-  {
-    path: '/timetable',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'timetable',
-        component: () => import('@/views/timetable/index'),
-        meta: { title: '课程表', icon: 'table' }
-      }
-    ]
-  },
-  {
-    path: '/user',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'user',
-        component: () => import('@/views/user/index'),
-        meta: { title: '用户', icon: 'table' }
-      }
-    ]
-  },
-  {
-    path: '/student',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'student',
-        component: () => import('@/views/student/index'),
-        meta: { title: '学生', icon: 'table' }
-      }
-    ]
-  },
-  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
   },
-
   {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
   },
-
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/class/index'
-  },
-
   {
     path: '/profile',
     component: Layout,
@@ -139,6 +77,112 @@ export const constantRoutes = [
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
+/*export const constantRoutes = [
+                {
+                  path: '/',
+                  component: Layout,
+                  redirect: '/class/index'
+                },
+                {
+                path: '/cate',
+                component: Layout,
+                children: [
+                  {
+                    path: 'index',
+                    name: 'cate',
+                    component: () => import('@/views/cate/index'),
+                    meta: { title: '分类', icon: 'table' }
+                  }
+                ]
+              },
+              {
+                path: '/class',
+                component: Layout,
+                children: [
+                  {
+                    path: 'index',
+                    name: 'class',
+                    component: () => import('@/views/class/index'),
+                    meta: { title: '班级', icon: 'table' }
+                  }
+                ]
+              },
+              {
+                path: '/course',
+                component: Layout,
+                children: [
+                  {
+                    path: 'index',
+                    name: 'course',
+                    component: () => import('@/views/course/index'),
+                    meta: { title: '课程', icon: 'table' }
+                  }
+                ]
+              },
+              {
+                path: '/timetable',
+                component: Layout,
+                children: [
+                  {
+                    path: 'index',
+                    name: 'timetable',
+                    component: () => import('@/views/timetable/index'),
+                    meta: { title: '课程表', icon: 'table' }
+                  }
+                ]
+              },
+              {
+                path: '/user',
+                component: Layout,
+                children: [
+                  {
+                    path: 'index',
+                    name: 'user',
+                    component: () => import('@/views/user/index'),
+                    meta: { title: '用户', icon: 'table' }
+                  }
+                ]
+              },
+              {
+                path: '/student',
+                component: Layout,
+                children: [
+                  {
+                    path: 'index',
+                    name: 'student',
+                    component: () => import('@/views/student/index'),
+                    meta: { title: '学生', icon: 'table' }
+                  }
+                ]
+              },
+  {
+    path: '/login',
+    component: () => import('@/views/login/index'),
+    hidden: true
+  },
+
+  {
+    path: '/404',
+    component: () => import('@/views/404'),
+    hidden: true
+  },
+  {
+    path: '/profile',
+    component: Layout,
+    redirect: '/profile/index',
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/profile/index'),
+        name: 'Profile',
+        meta: { title: '用户中心', icon: 'user', noCache: true }
+      }
+    ]
+  },
+  // 404 page must be placed at the end !!!
+  { path: '*', redirect: '/404', hidden: true } 
+]*/
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support

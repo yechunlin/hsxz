@@ -49,3 +49,10 @@ export function deleteUser(data) {
     data
   })
 }
+export function getRouter(query) {
+  return request({
+    url: 'admin/user/getRouter',
+    method: 'get',
+    params: query
+  })
+}
