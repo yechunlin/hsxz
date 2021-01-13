@@ -1,13 +1,13 @@
 <template>
     <div class="app-container">
-        <div class="filter-container" style="margin:0 0 5px 0">
+        <div class="filter-container" style="margin:0 0 5px 0" >
             <el-input v-model="listQuery.id" placeholder="课程表id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-input v-model="listQuery.user_id" placeholder="用户id" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-input v-model="listQuery.class_id" placeholder="班级id" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
             </el-button>
-            <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+            <el-button v-if="is_studengt" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
                 添加
             </el-button>
         </div>
@@ -71,8 +71,15 @@
                 <el-form-item label="用户ID" prop="user_id">
                     <el-input v-model="temp.user_id" />
                 </el-form-item>
-                <el-form-item label="班级ID" prop="class_id">
-                    <el-input v-model="temp.class_id" />
+                <el-form-item label="分类" prop="cate_id">
+                    <el-select v-model="temp.cate_id" placeholder="分类" @change="selectCateId">
+                    <el-option v-for="items in selectCate" :key="items.id" :label="items.name" :value="items.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="班级" prop="class_id">
+                    <el-select v-model="temp.class_id" placeholder="选择关联班级">
+                    <el-option v-for="items in selectClass" :key="items.id" :label="items.name" :value="items.id" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="开始时间">
                     <el-date-picker v-model="temp.start_dated" type="date" placeholder="开始时间" value-format="yyyy-MM-dd" style="width: 100%;" />
@@ -97,6 +104,7 @@
 <script>
     import { getClass, addClass, updateClass, deleteClass } from '@/api/class'
     import { getTimeTable, addTimeTable, updateTimeTable, deleteTimeTable } from '@/api/timetable'
+    import { getCate } from '@/api/cate'
     import waves from '@/directive/waves' // waves directive
     import { parseTime } from '@/utils'
     import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -139,11 +147,18 @@
                     start_dated: [{ required: true, message: 'start_dated is required', trigger: 'blur' }],
                     end_dated: [{ required: true, message: 'end_dated is required', trigger: 'blur' }]
                 },
-                downloadLoading: false
+                downloadLoading: false,
+                selectCate: {},
+                selectClass: {}
+            }
+        },
+        computed:{
+            is_studengt:function () {
+                return this.$store.getters.userinfo.type == 1 ? true : false;
             }
         },
         created() {
-            this.getTimeTableList();
+            this.getTimeTableList()
         },
         methods: {
             getTimeTableList() {
@@ -192,6 +207,9 @@
                 }
             },
             handleCreate() {
+                if(JSON.stringify(this.selectCate) == '{}'){
+                    this.getSelectCate();
+                }
                 this.resetTemp()
                 this.dialogStatus = 'create'
                 this.dialogFormVisible = true
@@ -251,6 +269,25 @@
                         duration: 2000
                     })
                     this.list.splice(index, 1)
+                })
+            },
+            getSelectCate: function(){
+                getCate({
+                    limit: 100
+                }).then(response => {
+                    this.selectCate = response.data.items
+                })
+            },
+            selectCateId: function(val){
+                //console.log(val)
+                this.getSelectClass(val);
+            },
+            getSelectClass: function(cate_id){
+                getClass({
+                    cate_id: cate_id,
+                    limit: 100
+                }).then(response => {
+                    this.selectClass = response.data.items
                 })
             },
             getSortClass: function(key) {

@@ -114,6 +114,11 @@
                     </div>
                     <el-progress type="line" :percentage="percentage" :status="proStatus" :class="typePro"></el-progress>
                 </el-form-item>
+                <el-form-item label="所属分类" prop="cate_id">
+                    <el-select v-model="temp.cate_id" placeholder="分类" @change="selectCateId">
+                    <el-option v-for="items in selectCate" :key="items.id" :label="items.name" :value="items.id" />
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="所属班级" prop="class_id">
                     <el-select v-model="temp.class_id" placeholder="选择关联班级">
                     <el-option v-for="items in selectClass" :key="items.id" :label="items.name" :value="items.id" />
@@ -140,6 +145,7 @@
 
 <script>
     import { getCourse, addCourse, updateCourse, deleteCourse } from '@/api/course'
+    import { getCate } from '@/api/cate'
     import { getClass } from '@/api/class'
     import { getUser } from '@/api/user'
     import waves from '@/directive/waves' // waves directive
@@ -187,6 +193,7 @@
                     class_id: [{ required: true, message: 'class_id is required', trigger: 'blur' }],
                     teacher_id: [{ required: true, message: 'teacher_id is required', trigger: 'blur' }]
                 },
+                selectCate: {},
                 selectClass: {},
                 selectTeacher: {},
 
@@ -209,8 +216,8 @@
         },
         created() {
             this.getCourseList();
-            if(JSON.stringify(this.selectClass) == '{}'){
-                this.getSelectClass();
+            if(JSON.stringify(this.selectCate) == '{}'){
+                this.getSelectCate();
             }
         },
         computed:{
@@ -299,6 +306,8 @@
                 if(JSON.stringify(this.selectTeacher) == '{}'){
                     this.getSelectTeacher();
                 }
+                this.getSelectClass(row.cate_id);
+                //console.log(row)
                 this.temp = Object.assign({}, row) // copy obj
                 this.dialogStatus = 'update'
                 this.dialogFormVisible = true
@@ -311,8 +320,9 @@
                     if (valid) {
                         const tempData = Object.assign({}, this.temp)
                         updateCourse(tempData).then((response) => {
+                            //console.log(response)
                             const index = this.list.findIndex(v => v.id === this.temp.id)
-                            this.list.splice(index, 1, this.temp)
+                            this.list.splice(index, 1, response.data)
                             this.dialogFormVisible = false
                             this.$notify({
                                 title: 'Success',
@@ -335,8 +345,20 @@
                     this.list.splice(index, 1)
                 })
             },
-            getSelectClass: function(){
+            getSelectCate: function(){
+                getCate({
+                    limit: 100
+                }).then(response => {
+                    this.selectCate = response.data.items
+                })
+            },
+            selectCateId: function(val){
+                //console.log(val)
+                this.getSelectClass(val);
+            },
+            getSelectClass: function(cate_id){
                 getClass({
+                    cate_id: cate_id,
                     limit: 100
                 }).then(response => {
                     this.selectClass = response.data.items

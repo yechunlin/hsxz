@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
+import router from '@/router'
 import { getToken, getUserId } from '@/utils/auth'
 
 // create an axios instance
@@ -44,6 +45,7 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
+
     const res = response.data
     // if the custom status is not 1, it is judged as an error.
     if (res.status === 0) {
@@ -80,8 +82,8 @@ service.interceptors.response.use(
     })
     if(error.response.status == 403){
       //location.reload()
-      this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      store.dispatch('user/logout')
+      router.push(`/login`)
     }
     return Promise.reject(error)  
   }

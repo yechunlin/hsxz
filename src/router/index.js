@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '../store'
 
 Vue.use(Router)
 
@@ -31,21 +32,88 @@ import Layout from '@/layout'
  * all roles can be accessed
  */
 
+
 export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/class/index'
+    redirect: '/timetable/index'
+  },
+  {
+    path: '/timetable',
+    component: Layout,
+    hidden: false,
+    children: [
+      {
+        path: 'index',
+        name: 'timetable',
+        component: () => import('@/views/timetable/index'),
+        meta: { title: '课程表', icon: 'table' }
+      }
+    ]
+  },
+  {
+    path: '/cate',
+    component: Layout,
+    hidden: false,
+    children: [
+      {
+        path: 'index',
+        name: 'cate',
+        component: () => import('@/views/cate/index'),
+        meta: { title: '分类', icon: 'table' }
+      }
+    ]
   },
   {
     path: '/class',
     component: Layout,
+    hidden: false,
     children: [
       {
         path: 'index',
         name: 'class',
         component: () => import('@/views/class/index'),
         meta: { title: '班级', icon: 'table' }
+      }
+    ]
+  },
+  {
+    path: '/course',
+    component: Layout,
+    hidden: false,
+    children: [
+      {
+        path: 'index',
+        name: 'course',
+        component: () => import('@/views/course/index'),
+        meta: { title: '课程', icon: 'table' }
+      }
+    ]
+  },
+  {
+    path: '/user',
+    component: Layout,
+    hidden: false,
+    children: [
+      {
+        path: 'index',
+        name: 'user',
+        component: () => import('@/views/user/index'),
+        meta: { title: '用户', icon: 'table' }
+      }
+    ]
+  },
+  {
+    path: '/student',
+    component: Layout,
+    hidden: false,
+    children: [
+      {
+        path: 'index',
+        name: 'student',
+        component: () => import('@/views/student/index'),
+        meta: { title: '学生', icon: 'table' }
       }
     ]
   },
@@ -189,7 +257,7 @@ const createRouter = () => new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
-
+console.log('routeing')
 const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465

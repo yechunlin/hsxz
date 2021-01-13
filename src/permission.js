@@ -13,7 +13,7 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 const whiteList = ['/login'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
-  console.log(to.path)
+  
   // start progress bar
   NProgress.start()
 
@@ -25,117 +25,44 @@ router.beforeEach(async(to, from, next) => {
 
   if (hasToken) {
     if (to.path === '/login') {
-      console.log(2)
       // if is logged in, redirect to the home page
       next({ path: '/' })
       NProgress.done()
     } else {
+      var hidenRouterArr = {
+        1 : [],
+        2 : ['/cate','/class','/course','/user','/student']
+      }
       const hasGetUserInfo = store.getters.username
       if (hasGetUserInfo) {
-        console.log(3)
+       
         next()
       } else {
-        console.log(4)
+        
         try {
           // get user info
           await store.dispatch('user/getInfo')
-          var addRouter = [];
-          if(store.getters.userinfo.type == 2){
-            addRouter = [{
-              path: '/timetable',
-              component: Layout,
-              children: [
-                {
-                  path: 'index',
-                  name: 'timetable',
-                  component: () => import('@/views/timetable/index'),
-                  meta: { title: '课程表', icon: 'table' }
-                }
-              ]
-            }];
-            //router.addRoutes(addRouter);
-            //router.options.routes = constantRoutes.concat(addRouter)  
-          }else if(store.getters.userinfo.type == 1){
-            addRouter = [
-              {
-                path: '/cate',
-                component: Layout,
-                children: [
-                  {
-                    path: 'index',
-                    name: 'cate',
-                    component: () => import('@/views/cate/index'),
-                    meta: { title: '分类', icon: 'table' }
-                  }
-                ]
-              },
 
-              {
-                path: '/course',
-                component: Layout,
-                children: [
-                  {
-                    path: 'index',
-                    name: 'course',
-                    component: () => import('@/views/course/index'),
-                    meta: { title: '课程', icon: 'table' }
-                  }
-                ]
-              },
-              {
-                path: '/timetable',
-                component: Layout,
-                children: [
-                  {
-                    path: 'index',
-                    name: 'timetable',
-                    component: () => import('@/views/timetable/index'),
-                    meta: { title: '课程表', icon: 'table' }
-                  }
-                ]
-              },
-              {
-                path: '/user',
-                component: Layout,
-                children: [
-                  {
-                    path: 'index',
-                    name: 'user',
-                    component: () => import('@/views/user/index'),
-                    meta: { title: '用户', icon: 'table' }
-                  }
-                ]
-              },
-              {
-                path: '/student',
-                component: Layout,
-                children: [
-                  {
-                    path: 'index',
-                    name: 'student',
-                    component: () => import('@/views/student/index'),
-                    meta: { title: '学生', icon: 'table' }
-                  }
-                ]
-              }
-            ];
-            router.addRoutes(addRouter)
-            router.options.routes = constantRoutes.concat(addRouter) 
+          for(let i in constantRoutes){
+            if(hidenRouterArr[store.getters.userinfo.type].indexOf(constantRoutes[i]['path']) > -1 ){
+              constantRoutes[i]['hidden'] = true;
+            }
           }
-          //router.options.routes;
-          console.log(router.options.routes);
+          //router.addRoutes(addRouter[store.getters.userinfo.type])
+          router.options.routes = constantRoutes
+          
           next()
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
           Message.error(error || 'Has Error')
-          next(`/login?redirect=${to.path}`)
+          next(`/login`)
           NProgress.done()
         }
       }
     }
   } else {
-    console.log(1)
+
     /* has no token*/
 
     if (whiteList.indexOf(to.path) !== -1) {
@@ -143,7 +70,7 @@ router.beforeEach(async(to, from, next) => {
       next()
     } else {
       // other pages that do not have permission to access are redirected to the login page.
-      next(`/login?redirect=${to.path}`)
+      next(`/login`)
       NProgress.done()
     }
   }
