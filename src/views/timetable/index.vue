@@ -3,7 +3,13 @@
         <div class="filter-container" style="margin:0 0 5px 0" >
             <el-input v-model="listQuery.id" placeholder="课程表id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-input v-model="listQuery.user_id" placeholder="用户id" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-            <el-input v-model="listQuery.class_id" placeholder="班级id" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-select v-model="listQuery.cate_id" placeholder="分类" clearable class="filter-item" style="margin-left: 10px;width: 130px" @change="selectCateId">
+                <el-option key="0_0" label="选择分类" value="0" />
+                <el-option v-for="item in selectCate" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
+            </el-select>
+            <el-select v-model="listQuery.class_id" placeholder="班级" clearable class="filter-item" style="margin-left: 10px;width: 130px">
+                <el-option v-for="item in selectClass" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
+            </el-select>
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
             </el-button>
@@ -158,7 +164,8 @@
             }
         },
         created() {
-            this.getTimeTableList()
+            this.getTimeTableList();
+            this.getSelectCate();
         },
         methods: {
             getTimeTableList() {
@@ -207,9 +214,6 @@
                 }
             },
             handleCreate() {
-                if(JSON.stringify(this.selectCate) == '{}'){
-                    this.getSelectCate();
-                }
                 this.resetTemp()
                 this.dialogStatus = 'create'
                 this.dialogFormVisible = true
@@ -235,6 +239,7 @@
                 })
             },
             handleUpdate(row) {
+                this.getSelectClass(row.cate_id);
                 this.temp = Object.assign({}, row) // copy obj
                 this.dialogStatus = 'update'
                 this.dialogFormVisible = true
@@ -248,7 +253,7 @@
                         const tempData = Object.assign({}, this.temp)
                         updateTimeTable(tempData).then((response) => {
                             const index = this.list.findIndex(v => v.id === this.temp.id)
-                            this.list.splice(index, 1, this.temp)
+                            this.list.splice(index, 1, response.data)
                             this.dialogFormVisible = false
                             this.$notify({
                                 title: 'Success',
@@ -280,7 +285,11 @@
             },
             selectCateId: function(val){
                 //console.log(val)
-                this.getSelectClass(val);
+                if(Number(val)){
+                    this.getSelectClass(val);
+                }else{
+                    this.selectClass = {}
+                }
             },
             getSelectClass: function(cate_id){
                 getClass({
