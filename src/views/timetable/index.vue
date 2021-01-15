@@ -1,8 +1,8 @@
 <template>
     <div class="app-container">
         <div class="filter-container" style="margin:0 0 5px 0" >
-            <el-input v-model="listQuery.id" placeholder="课程表id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
-            <el-input v-model="listQuery.user_id" placeholder="用户id" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-if="is_admin" v-model="listQuery.id" placeholder="课程表id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-if="is_admin" v-model="listQuery.user_id" placeholder="用户id" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-select v-model="listQuery.cate_id" placeholder="分类" clearable class="filter-item" style="margin-left: 10px;width: 130px" @change="selectCateId">
                 <el-option key="0_0" label="选择分类" value="0" />
                 <el-option v-for="item in selectCate" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
@@ -13,7 +13,7 @@
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
             </el-button>
-            <el-button v-if="is_studengt" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+            <el-button v-if="is_admin" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
                 添加
             </el-button>
         </div>
@@ -58,13 +58,16 @@
                     <span>{{ row.dated }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+            <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width" >
                 <template slot-scope="{row,$index}">
-                    <el-button type="primary" size="mini" @click="handleUpdate(row)">
+                    <el-button v-if="is_admin" type="primary" size="mini" @click="handleUpdate(row)">
                         编辑
                     </el-button>
-                    <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
+                    <el-button v-if="is_admin" size="mini" type="danger" @click="handleDelete(row,$index)">
                         删除
+                    </el-button>
+                    <el-button type="primary" size="mini" @click="handleDetail(row)">
+                        详情
                     </el-button>
                 </template>
             </el-table-column>
@@ -104,6 +107,15 @@
             </div>
         </el-dialog>
 
+        <el-dialog title="详情" :visible.sync="dialogDetailVisible">
+
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogDetailVisible = false">
+                    退出
+                </el-button>
+            </div>
+        </el-dialog>
+
     </div>
 </template>
 
@@ -111,6 +123,7 @@
     import { getClass, addClass, updateClass, deleteClass } from '@/api/class'
     import { getTimeTable, addTimeTable, updateTimeTable, deleteTimeTable } from '@/api/timetable'
     import { getCate } from '@/api/cate'
+    import { getCourse } from '@/api/course'
     import waves from '@/directive/waves' // waves directive
     import { parseTime } from '@/utils'
     import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -141,6 +154,7 @@
                     end_dated: ''
                 },
                 dialogFormVisible: false,
+                dialogDetailVisible: true,
                 dialogStatus: '',
                 textMap: {
                     update: '编辑',
@@ -155,11 +169,12 @@
                 },
                 downloadLoading: false,
                 selectCate: {},
-                selectClass: {}
+                selectClass: {},
+                selectCourse: {}
             }
         },
         computed:{
-            is_studengt:function () {
+            is_admin:function () {
                 return this.$store.getters.userinfo.type == 1 ? true : false;
             }
         },
@@ -274,6 +289,15 @@
                         duration: 2000
                     })
                     this.list.splice(index, 1)
+                })
+            },
+            handleDetail(row) {
+                this.dialogDetailVisible = true
+                getCourse({
+                    limit: 100,
+                    class_id: row.class_id
+                }).then(response => {
+                    this.selectCourse = response.data.items
                 })
             },
             getSelectCate: function(){
