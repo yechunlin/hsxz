@@ -3,12 +3,16 @@
         <div class="filter-container" style="margin:0 0 5px 0" >
             <el-input v-if="is_admin" v-model="listQuery.id" placeholder="课程表id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-input v-if="is_admin" v-model="listQuery.user_id" placeholder="用户id" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-            <el-select v-model="listQuery.cate_id" placeholder="分类" clearable class="filter-item" style="margin-left: 10px;width: 130px" @change="selectCateId">
+            <el-select v-if="is_admin" v-model="listQuery.cate_id" placeholder="分类" clearable class="filter-item" style="margin-left: 10px;width: 130px" @change="selectCateId">
                 <el-option key="0_0" label="选择分类" value="0" />
                 <el-option v-for="item in selectCate" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
             </el-select>
-            <el-select v-model="listQuery.class_id" placeholder="班级" clearable class="filter-item" style="margin-left: 10px;width: 130px">
+            <el-select v-if="is_admin" v-model="listQuery.class_id" placeholder="班级" clearable class="filter-item" style="margin-left: 10px;width: 130px">
                 <el-option v-for="item in selectClass" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
+            </el-select>
+             <el-select v-else v-model="listQuery.class_id" placeholder="选择班级" clearable class="filter-item" style="margin-left: 10px;width: 130px">
+                 <el-option key="0_0" label="选择班级" value="0" />
+                <el-option v-for="item in selectUserClass" :key="item.class_id+'_'+item.class_id" :label="item.class_name" :value="item.class_id" />
             </el-select>
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
@@ -108,7 +112,31 @@
         </el-dialog>
 
         <el-dialog title="详情" :visible.sync="dialogDetailVisible">
-
+            <!-- <p v-for="items in selectCourse" :key="'detail'+items.id">{{ items.id }}、{{ items.title }} {{ items.teacher_name }}</p> -->
+            <el-table
+                :key="tableKey1"
+                :data="selectCourse"
+                border
+                fit
+                highlight-current-row
+                style="width: 100%;"
+            >
+            <el-table-column label="封面" min-width="30px">
+                <template slot-scope="{row}">
+                    <img :src="row.cover" style="height:40px">
+                </template>
+            </el-table-column>
+            <el-table-column label="课程" min-width="100px">
+                <template slot-scope="{row}">
+                    <span class="link-type">{{ row.title }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="老师" min-width="50px">
+                <template slot-scope="{row}">
+                    <span class="link-type">{{ row.teacher_name }}</span>
+                </template>
+            </el-table-column>
+            </el-table>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogDetailVisible = false">
                     退出
@@ -121,7 +149,7 @@
 
 <script>
     import { getClass, addClass, updateClass, deleteClass } from '@/api/class'
-    import { getTimeTable, addTimeTable, updateTimeTable, deleteTimeTable } from '@/api/timetable'
+    import { getTimeTable, addTimeTable, updateTimeTable, deleteTimeTable, getUserClass } from '@/api/timetable'
     import { getCate } from '@/api/cate'
     import { getCourse } from '@/api/course'
     import waves from '@/directive/waves' // waves directive
@@ -137,6 +165,7 @@
         data() {
             return {
                 tableKey: 0,
+                tableKey1: 1,
                 list: null,
                 total: 0,
                 listLoading: true,
@@ -154,7 +183,7 @@
                     end_dated: ''
                 },
                 dialogFormVisible: false,
-                dialogDetailVisible: true,
+                dialogDetailVisible: false,
                 dialogStatus: '',
                 textMap: {
                     update: '编辑',
@@ -170,7 +199,8 @@
                 downloadLoading: false,
                 selectCate: {},
                 selectClass: {},
-                selectCourse: {}
+                selectCourse: {},
+                selectUserClass: {}
             }
         },
         computed:{
@@ -181,10 +211,14 @@
         created() {
             this.getTimeTableList();
             this.getSelectCate();
+            this.getUserSelectClass(this.$store.getters.userinfo.type);
         },
         methods: {
             getTimeTableList() {
                 this.listLoading = true
+                if(this.$store.getters.userinfo.type != 1){
+                    this.listQuery.user_id = this.$store.getters.userinfo.id
+                }
                 getTimeTable(this.listQuery).then(response => {
                     //console.log(response.data);
                     this.list = response.data.items
@@ -292,12 +326,13 @@
                 })
             },
             handleDetail(row) {
-                this.dialogDetailVisible = true
                 getCourse({
                     limit: 100,
                     class_id: row.class_id
                 }).then(response => {
+                    //console.log(response)
                     this.selectCourse = response.data.items
+                    this.dialogDetailVisible = true
                 })
             },
             getSelectCate: function(){
@@ -322,6 +357,16 @@
                 }).then(response => {
                     this.selectClass = response.data.items
                 })
+            },
+            getUserSelectClass: function(type){
+                if(type != 1){
+                    getUserClass({
+                        user_id: this.$store.getters.userinfo.id,
+                        limit: 100
+                    }).then(response => {
+                        this.selectUserClass = response.data.items
+                    })
+                }
             },
             getSortClass: function(key) {
                 const sort = this.listQuery.sort

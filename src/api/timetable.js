@@ -28,3 +28,10 @@ export function deleteTimeTable(data) {
     data
   })
 }
+export function getUserClass(params) {
+  return request({
+    url: 'admin/Timetable/getUserClass',
+    method: 'get',
+    params
+  })
+}

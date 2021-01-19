@@ -6,7 +6,6 @@ import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
 import Layout from '@/layout'
-import { constantRoutes } from './router/index'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -35,22 +34,135 @@ router.beforeEach(async(to, from, next) => {
       }
       const hasGetUserInfo = store.getters.username
       if (hasGetUserInfo) {
-       
+ 
         next()
       } else {
-        
+  
         try {
           // get user info
           await store.dispatch('user/getInfo')
+          
+          var tmpRouterArr = [
+            {
+              path: '/',
+              component: Layout,
+              redirect: '/timetable/index'
+            },
+            {
+              path: '/timetable',
+              component: Layout,
+              hidden: false,
+              children: [
+                {
+                  path: 'index',
+                  name: 'timetable',
+                  component: () => import('@/views/timetable/index'),
+                  meta: { title: '课程表', icon: 'table' }
+                }
+              ]
+            },
+            {
+              path: '/cate',
+              component: Layout,
+              hidden: false,
+              children: [
+                {
+                  path: 'index',
+                  name: 'cate',
+                  component: () => import('@/views/cate/index'),
+                  meta: { title: '分类', icon: 'table' }
+                }
+              ]
+            },
+            {
+              path: '/class',
+              component: Layout,
+              hidden: false,
+              children: [
+                {
+                  path: 'index',
+                  name: 'class',
+                  component: () => import('@/views/class/index'),
+                  meta: { title: '班级', icon: 'table' }
+                }
+              ]
+            },
+            {
+              path: '/course',
+              component: Layout,
+              hidden: false,
+              children: [
+                {
+                  path: 'index',
+                  name: 'course',
+                  component: () => import('@/views/course/index'),
+                  meta: { title: '课程', icon: 'table' }
+                }
+              ]
+            },
+            {
+              path: '/user',
+              component: Layout,
+              hidden: false,
+              children: [
+                {
+                  path: 'index',
+                  name: 'user',
+                  component: () => import('@/views/user/index'),
+                  meta: { title: '用户', icon: 'table' }
+                }
+              ]
+            },
+            {
+              path: '/student',
+              component: Layout,
+              hidden: false,
+              children: [
+                {
+                  path: 'index',
+                  name: 'student',
+                  component: () => import('@/views/student/index'),
+                  meta: { title: '学生', icon: 'table' }
+                }
+              ]
+            },
+            {
+              path: '/login',
+              component: () => import('@/views/login/index'),
+              hidden: true
+            },
+            {
+              path: '/404',
+              component: () => import('@/views/404'),
+              hidden: true
+            },
+            {
+              path: '/profile',
+              component: Layout,
+              redirect: '/profile/index',
+              hidden: true,
+              children: [
+                {
+                  path: 'index',
+                  component: () => import('@/views/profile/index'),
+                  name: 'Profile',
+                  meta: { title: '用户中心', icon: 'user', noCache: true }
+                }
+              ]
+            },
+          
+            // 404 page must be placed at the end !!!
+            { path: '*', redirect: '/404', hidden: true }
+          ];
 
-          for(let i in constantRoutes){
-            if(hidenRouterArr[store.getters.userinfo.type].indexOf(constantRoutes[i]['path']) > -1 ){
-              constantRoutes[i]['hidden'] = true;
+          for(let i in tmpRouterArr){
+            if(hidenRouterArr[store.getters.userinfo.type].indexOf(tmpRouterArr[i]['path']) > -1 ){
+              tmpRouterArr[i]['hidden'] = true;
             }
           }
           //router.addRoutes(addRouter[store.getters.userinfo.type])
-          router.options.routes = constantRoutes
-          
+          router.options.routes = tmpRouterArr
+
           next()
         } catch (error) {
           // remove token and go to login page to re-login
