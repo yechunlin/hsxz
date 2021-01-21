@@ -157,8 +157,7 @@
             },
             resetTemp() {
                 this.temp = {
-                    name: '',
-                    description: ''
+                    name: ''
                 }
             },
             handleCreate() {
