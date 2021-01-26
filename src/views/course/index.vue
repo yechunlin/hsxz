@@ -110,7 +110,7 @@
                         </div>
                     </div>
                     <div class="file">
-                        <input type="file" v-on:change="videoUploadAction($event)" />上传视频
+                        <input type="file" ref="clearFile" v-on:change="videoUploadAction($event)" />上传视频
                     </div>
                     <el-progress type="line" :percentage="percentage" :status="proStatus" :class="typePro"></el-progress>
                 </el-form-item>
@@ -282,6 +282,7 @@
                 this.dialogStatus = 'create'
                 this.dialogFormVisible = true
                 this.$nextTick(() => {
+                    this.$refs['clearFile'].value = '';
                     this.$refs['dataForm'].clearValidate()
                 })
             },
@@ -383,8 +384,10 @@
                 this.temp.cover = '';
             },
             videoUploadAction(file){
+
                 //获取到选中的文件
                 this.fileObject = file.target.files[0];
+                console.log(this.fileObject)
                 //多次在同一个input上选择文件，当取消时，会出现file为undefined
                 if(typeof(this.fileObject) == 'undefined') return ;
                 
