@@ -6,7 +6,7 @@
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
                 搜索
             </el-button>
-            <el-button v-if="is_admin" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+            <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
                 添加
             </el-button>
         </div>
@@ -56,7 +56,7 @@
                     <span>{{ row.lastdated }}</span>
                 </template>
             </el-table-column>
-            <el-table-column v-if="is_admin" label="操作" align="center" width="230" class-name="small-padding fixed-width">
+            <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
                 <template slot-scope="{row,$index}">
                     <el-button type="primary" size="mini" @click="handleUpdate(row)">
                         编辑
@@ -150,11 +150,6 @@
                     phone: [{ required: true, message: 'phone is required', trigger: 'blur' }]
                 },
                 downloadLoading: false
-            }
-        },
-        computed:{
-            is_admin:function () {
-                return this.$store.getters.id == 1 ? true : false;
             }
         },
         created() {
