@@ -4,14 +4,12 @@
             <el-input v-if="is_admin" v-model="listQuery.id" placeholder="课程表id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-input v-if="is_admin" v-model="listQuery.user_id" placeholder="用户id" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-select v-if="is_admin" v-model="listQuery.cate_id" placeholder="分类" clearable class="filter-item" style="margin-left: 10px;width: 130px" @change="selectCateId">
-                <el-option key="0_0" label="选择分类" value="0" />
                 <el-option v-for="item in selectCate" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
             </el-select>
             <el-select v-if="is_admin" v-model="listQuery.class_id" placeholder="班级" clearable class="filter-item" style="margin-left: 10px;width: 130px">
                 <el-option v-for="item in selectClass" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
             </el-select>
-             <el-select v-else v-model="listQuery.class_id" placeholder="选择班级" clearable class="filter-item" style="margin-left: 10px;width: 130px">
-                 <el-option key="0_0" label="选择班级" value="0" />
+             <el-select v-else v-model="listQuery.class_id" placeholder="班级" clearable class="filter-item" style="margin-left: 10px;width: 130px">
                 <el-option v-for="item in selectUserClass" :key="item.class_id+'_'+item.class_id" :label="item.class_name" :value="item.class_id" />
             </el-select>
             <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">

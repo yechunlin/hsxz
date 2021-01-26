@@ -3,6 +3,9 @@
         <div class="filter-container" style="margin:0 0 5px 0">
             <el-input v-model="listQuery.id" placeholder="课程id" style="width: 100px;" class="filter-item" @keyup.enter.native="handleFilter" />
             <el-input v-model="listQuery.title" placeholder="课程名称" style="margin-left: 10px;width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-select v-model="listQuery.cate_id" placeholder="分类" clearable class="filter-item" style="margin-left: 10px;width: 130px" @change="selectCateId">
+                <el-option v-for="item in selectCate" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
+            </el-select>
             <el-select v-model="listQuery.class_id" placeholder="班级" clearable class="filter-item" style="margin-left: 10px;width: 130px">
                 <el-option v-for="item in selectClass" :key="item.id+'_'+item.id" :label="item.name" :value="item.id" />
             </el-select>
@@ -58,6 +61,16 @@
             <el-table-column label="创建者" width="110px" align="center">
                 <template slot-scope="{row}">
                     <span>{{ row.admin_name }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="推荐指数" width="110px" align="center">
+                <template slot-scope="{row}">
+                    <span>{{ row.recom }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="级别" width="110px" align="center">
+                <template slot-scope="{row}">
+                    <span>{{ row.level_name }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -129,6 +142,14 @@
                     <el-option v-for="items in selectTeacher" :key="items.id" :label="items.username" :value="items.id" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="推荐指数" prop="recom">
+                    <el-input v-model="temp.recom" />
+                </el-form-item>
+                <el-form-item label="级别" prop="level">
+                    <el-select v-model="temp.level" placeholder="选择课程级别">
+                    <el-option v-for="items in levelMap" :key="items.value" :label="items.name" :value="items.value" />
+                    </el-select>
+                </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">
@@ -177,7 +198,9 @@
                     cover: '',
                     video: '',
                     class_id: '',
-                    teacher_id: ''
+                    teacher_id: '',
+                    recom: '',
+                    level: ''
                 },
                 dialogFormVisible: false,
                 dialogStatus: '',
@@ -185,6 +208,11 @@
                     update: '编辑',
                     create: '添加'
                 },
+                levelMap: [
+                    { 'name':'初级','value':1 },
+                    { 'name':'中级','value':2 },
+                    { 'name':'高级','value':3 }
+                ],
                 dialogPvVisible: false,
                 rules: {
                     title: [{ required: true, message: 'title is required', trigger: 'blur' }],
@@ -268,7 +296,9 @@
                     cover: '',
                     video: '',
                     class_id: '',
-                    teacher_id: ''
+                    teacher_id: '',
+                    recom: '',
+                    level: ''
                 }
                 this.percentage = 0
                 this.proStatus = 'warning'
@@ -310,6 +340,7 @@
                 this.getSelectClass(row.cate_id);
                 //console.log(row)
                 this.temp = Object.assign({}, row) // copy obj
+                console.log(this.temp)
                 this.dialogStatus = 'update'
                 this.dialogFormVisible = true
                 this.$nextTick(() => {
