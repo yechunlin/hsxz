@@ -334,13 +334,14 @@
                 })
             },
             handleUpdate(row) {
+                this.resetTemp()
                 if(JSON.stringify(this.selectTeacher) == '{}'){
                     this.getSelectTeacher();
                 }
                 this.getSelectClass(row.cate_id);
                 //console.log(row)
                 this.temp = Object.assign({}, row) // copy obj
-                console.log(this.temp)
+                //console.log(this.temp)
                 this.dialogStatus = 'update'
                 this.dialogFormVisible = true
                 this.$nextTick(() => {
@@ -419,7 +420,7 @@
 
                 //获取到选中的文件
                 this.fileObject = file.target.files[0];
-                console.log(this.fileObject)
+                //console.log(this.fileObject)
                 //多次在同一个input上选择文件，当取消时，会出现file为undefined
                 if(typeof(this.fileObject) == 'undefined') return ;
                 
