@@ -11,7 +11,7 @@
         :width="300"
         :height="300"
         field="file"
-        url="http://localhost/api/public/index.php/admin/Upload/execAction"
+        url="../api/public/index.php/admin/Upload/execAction"
         lang-type="zh"
         @close="close"
         @crop-upload-success="cropSuccess"
@@ -94,8 +94,8 @@ export default {
       //console.log(resData)
       this.imagecropperShow = false
       this.imagecropperKey = this.imagecropperKey + 1
-      this.user.avatar = 'http://localhost/api/' + resData.saveName
-      this.$store.commit("user/SET_AVATAR", 'http://localhost/api/' + resData.saveName);
+      this.user.avatar = '../api/' + resData.saveName
+      this.$store.commit("user/SET_AVATAR", '../api/' + resData.saveName);
     },
     close() {
       this.imagecropperShow = false

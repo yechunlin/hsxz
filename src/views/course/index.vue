@@ -108,7 +108,7 @@
                         :on-success="handleImageSuccess"
                         class="image-uploader"
                         drag
-                        action="http://localhost/api/public/index.php/admin/Upload/execAction"
+                        action="../api/public/index.php/admin/Upload/execAction"
                         >
                         <i class="el-icon-upload" />
                         <div class="el-upload__text">
@@ -235,7 +235,7 @@
                 chunkSize: 1*1024*1024, //分片文件大小 1M
                 uploadChunkNum: 0, //计算需要上传多少次，方便显示进度
                 uploadTimes: 0, //用于进度显示，当前属于哪一次
-                httpRequestUrl: 'http://localhost/api/public/index.php/admin/Upload/execActionBlod',// 服务端api
+                httpRequestUrl: '../api/public/index.php/admin/Upload/execActionBlod',// 服务端api
                 fileStart: 0, // 分片进度
                 percentage: 0, //进度
                 proStatus: 'warning',
@@ -344,6 +344,7 @@
                 this.dialogStatus = 'update'
                 this.dialogFormVisible = true
                 this.$nextTick(() => {
+                    this.$refs['clearFile'].value = '';
                     this.$refs['dataForm'].clearValidate()
                 })
             },
@@ -408,7 +409,7 @@
                 return sort == 0 ? 'ascending' : 'descending';
             },
             handleImageSuccess(file) {
-                this.temp.cover = 'http://localhost/api/' + file.data.saveName;
+                this.temp.cover = '../api/' + file.data.saveName;
                 //console.log(file);
             },
             rmImage(){
@@ -511,7 +512,7 @@
                 //console.log(data)
                 var that = this;
                 this.proStatus = 'success';
-                this.temp.video = 'http://localhost/api/' + data.saveFilePath + data.saveFileName;
+                this.temp.video = '../api/' + data.saveFilePath + data.saveFileName;
                 setTimeout(function(){
                     that.typeProCode = 0;
                 }, 1000);
